@@ -8,8 +8,8 @@ import { Badge, Button, Card, ErrorText, PageHeader, Spinner } from '@/component
 import type { BillingCycle, PlanType, Subscription } from '@/types';
 
 const PLAN_PRICES: Record<'pro' | 'max', Record<BillingCycle, number>> = {
-  pro: { monthly: 10, yearly: 54 },
-  max: { monthly: 10, yearly: 54 },
+  pro: { monthly: 5, yearly: 27 },
+  max: { monthly: 15, yearly: 81 },
 };
 
 const planFeatures: Record<string, string[]> = {

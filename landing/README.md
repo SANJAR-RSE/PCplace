@@ -31,7 +31,7 @@ barcha "Ro'yxatdan o'tish" / "Kirish" tugmalari shu manzilga yo'naltiriladi.
 - Xususiyatlar (xarita, real-time holat, VIP/umumiy xona, snacks)
 - "Qanday ishlaydi" — 4 qadam
 - Klub egalari uchun taklif
-- Pro/Max narxlar (spec 9-bo'lim bilan mos: $10/oy, $54/yil)
+- Pro/Max narxlar (Pro: $5/oy yoki $27/yil, Max: $15/oy yoki $81/yil)
 - Yopilish CTA + footer
 
 Animatsiyalar: scroll-reveal (`IntersectionObserver`), sticky/blur navbar, hover effektlar,

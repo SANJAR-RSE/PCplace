@@ -15,8 +15,8 @@ export enum SubscriptionStatus {
   CANCELLED = 'cancelled',
 }
 
-// Spec 9-bo'lim: hozircha Pro va Max narxlari bir xil ko'rsatilgan.
+// Spec 9-bo'lim: Pro va Max narxlari tasdiqlangan (yillik — oylikning ~45%iga chegirma bilan).
 export const PLAN_PRICES: Record<PlanType.PRO | PlanType.MAX, Record<BillingCycle, number>> = {
-  [PlanType.PRO]: { [BillingCycle.MONTHLY]: 10, [BillingCycle.YEARLY]: 54 },
-  [PlanType.MAX]: { [BillingCycle.MONTHLY]: 10, [BillingCycle.YEARLY]: 54 },
+  [PlanType.PRO]: { [BillingCycle.MONTHLY]: 5, [BillingCycle.YEARLY]: 27 },
+  [PlanType.MAX]: { [BillingCycle.MONTHLY]: 15, [BillingCycle.YEARLY]: 81 },
 };

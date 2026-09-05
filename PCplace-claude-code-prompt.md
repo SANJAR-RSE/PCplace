@@ -94,10 +94,10 @@ Ham **User**, ham **Kompyuterhona egasi** uchun bir xil narxda ikkita obuna tari
 
 | Tarif   | Oylik    | Yillik    |
 | ------- | -------- | --------- |
-| **Pro** | $10 / oy | $54 / yil |
-| **Max** | $10 / oy | $54 / yil |
+| **Pro** | $5 / oy  | $27 / yil |
+| **Max** | $15 / oy | $81 / yil |
 
-> **Eslatma:** Hozircha Pro va Max narxlari bir xil ko'rsatilgan ($10/oy, $54/yil) — bu, ehtimol, keyinchalik farqlanishi mumkin. Claude Code'ga ishni boshlashdan oldin buni tasdiqlab olish kerak (masalan, Max qimmatroq bo'lishi kerakmi, yoki narx rostdan ham bir xil, faqat funksiyalar farq qiladimi).
+> **Tasdiqlangan narxlar:** Pro — $5/oy ($27/yil), Max — $15/oy ($81/yil). Yillik narx oylikning ~45%iga chegirma bilan hisoblangan (12 oy × 45%).
 
 ### 9.1 Tariflar orasidagi farq (taxminiy — loyihani ishlab chiqishda aniqlashtirish kerak)
 
