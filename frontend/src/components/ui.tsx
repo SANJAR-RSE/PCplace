@@ -97,7 +97,7 @@ export function EmptyState({ title, hint }: { title: string; hint?: string }) {
   );
 }
 
-export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: string; action?: React.ReactNode }) {
+export function PageHeader({ title, subtitle, action }: { title: string; subtitle?: React.ReactNode; action?: React.ReactNode }) {
   return (
     <div className="mb-6 flex flex-wrap items-center justify-between gap-3">
       <div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { RequireRole } from '@/components/require-role';
 import { api, ApiError } from '@/lib/api';
 import { Badge, Button, Card, EmptyState, ErrorText, Field, Input, PageHeader, Spinner } from '@/components/ui';
+import { RatingBadge } from '@/components/star-rating';
 import type { Club, ClubStatus } from '@/types';
 
 const statusTone: Record<ClubStatus, 'default' | 'success' | 'warning' | 'danger'> = {
@@ -125,7 +126,9 @@ function OwnerContent() {
                 <Badge tone={statusTone[club.status]}>{statusLabel[club.status]}</Badge>
               </div>
               <p className="text-sm text-muted">{club.address}</p>
-              <p className="mt-2 text-sm">⭐ {club.ratingAverage.toFixed(1)} ({club.ratingCount})</p>
+              <p className="mt-2 text-sm">
+                <RatingBadge value={club.ratingAverage} count={club.ratingCount} />
+              </p>
             </Link>
           ))}
         </div>

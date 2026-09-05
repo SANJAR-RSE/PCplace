@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Check } from 'lucide-react';
 import { RequireRole } from '@/components/require-role';
 import { useAuth } from '@/lib/auth-context';
 import { api, ApiError } from '@/lib/api';
@@ -89,7 +90,9 @@ function SubscriptionsContent() {
             </p>
             <ul className="my-4 space-y-2 text-sm text-foreground/80">
               {features[plan].map((f) => (
-                <li key={f}>✓ {f}</li>
+                <li key={f} className="flex items-start gap-2">
+                  <Check size={16} className="mt-0.5 shrink-0 text-emerald-600" /> {f}
+                </li>
               ))}
             </ul>
             <Button

@@ -1,6 +1,7 @@
 'use client';
 
 import { FormEvent, use, useEffect, useState } from 'react';
+import { CheckCircle2, X } from 'lucide-react';
 import { RequireRole } from '@/components/require-role';
 import { api, ApiError } from '@/lib/api';
 import { Badge, Button, Card, EmptyState, ErrorText, Field, Input, PageHeader, Select, Spinner } from '@/components/ui';
@@ -16,6 +17,7 @@ function ClubInfoForm({ club, onSaved }: { club: Club; onSaved: (c: Club) => voi
   const [lng, setLng] = useState(String(club.location.lng));
   const [imageUrl, setImageUrl] = useState(club.imageUrl ?? '');
   const [msg, setMsg] = useState('');
+  const [msgOk, setMsgOk] = useState(false);
   const [saving, setSaving] = useState(false);
 
   async function submit(e: FormEvent) {
@@ -30,8 +32,10 @@ function ClubInfoForm({ club, onSaved }: { club: Club; onSaved: (c: Club) => voi
         imageUrl: imageUrl || undefined,
       });
       onSaved(updated);
-      setMsg('Saqlandi ✅');
+      setMsgOk(true);
+      setMsg('Saqlandi');
     } catch (err) {
+      setMsgOk(false);
       setMsg(err instanceof ApiError ? err.message : 'Saqlashda xatolik');
     } finally {
       setSaving(false);
@@ -62,7 +66,12 @@ function ClubInfoForm({ club, onSaved }: { club: Club; onSaved: (c: Club) => voi
         <Button type="submit" disabled={saving}>
           {saving ? 'Saqlanmoqda…' : 'Saqlash'}
         </Button>
-        {msg && <span className="ml-3 text-sm text-muted">{msg}</span>}
+        {msg && (
+          <span className="ml-3 inline-flex items-center gap-1 text-sm text-muted">
+            {msgOk && <CheckCircle2 size={14} className="text-emerald-600" />}
+            {msg}
+          </span>
+        )}
       </form>
     </Card>
   );
@@ -229,8 +238,8 @@ function PcsManager({ clubId }: { clubId: string }) {
                 <div key={pc._id} className="rounded-lg border border-border p-2 text-sm">
                   <div className="mb-1 flex items-center justify-between">
                     <span className="font-medium">{pc.label}</span>
-                    <Button variant="ghost" className="px-2 py-0.5 text-xs text-red-500" onClick={() => removePc(pc._id)}>
-                      ✕
+                    <Button variant="ghost" className="px-1.5 py-0.5 text-red-500" onClick={() => removePc(pc._id)}>
+                      <X size={14} />
                     </Button>
                   </div>
                   <Select value={pc.status} onChange={(e) => setStatus(pc, e.target.value as PcStatus)} className="py-1 text-xs">

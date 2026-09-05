@@ -4,6 +4,7 @@ import { useEffect } from 'react';
 import L from 'leaflet';
 import { MapContainer, Marker, Popup, TileLayer, useMap } from 'react-leaflet';
 import Link from 'next/link';
+import { RatingBadge } from '@/components/star-rating';
 import type { Club } from '@/types';
 
 // Next.js bundlingda leaflet'ning default marker rasm yo'llari singan bo'ladi — qo'lda tuzatamiz.
@@ -48,7 +49,9 @@ export function ClubsMap({ clubs, height = 420 }: { clubs: Club[]; height?: numb
               <div className="min-w-[160px]">
                 <p className="font-semibold">{club.name}</p>
                 <p className="text-xs text-gray-500">{club.address}</p>
-                <p className="mt-1 text-xs">⭐ {club.ratingAverage.toFixed(1)} ({club.ratingCount})</p>
+                <p className="mt-1 text-xs">
+                  <RatingBadge value={club.ratingAverage} count={club.ratingCount} size={12} />
+                </p>
                 <Link href={`/clubs/${club._id}`} className="mt-2 inline-block text-xs font-semibold text-indigo-600">
                   Ko&apos;rish →
                 </Link>

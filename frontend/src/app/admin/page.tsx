@@ -1,16 +1,17 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { Building2, CalendarCheck2, Gamepad2, User as UserIcon } from 'lucide-react';
 import { RequireRole } from '@/components/require-role';
 import { api } from '@/lib/api';
 import { Card, PageHeader, Spinner } from '@/components/ui';
 import type { AdminStats } from '@/types';
 
-const tiles: { key: keyof AdminStats; label: string; icon: string }[] = [
-  { key: 'usersCount', label: 'Foydalanuvchilar', icon: '👤' },
-  { key: 'ownersCount', label: 'Klub egalari', icon: '🏢' },
-  { key: 'clubsCount', label: 'Klublar', icon: '🎮' },
-  { key: 'bookingsCount', label: 'Bronlar', icon: '📅' },
+const tiles: { key: keyof AdminStats; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
+  { key: 'usersCount', label: 'Foydalanuvchilar', icon: UserIcon },
+  { key: 'ownersCount', label: 'Klub egalari', icon: Building2 },
+  { key: 'clubsCount', label: 'Klublar', icon: Gamepad2 },
+  { key: 'bookingsCount', label: 'Bronlar', icon: CalendarCheck2 },
 ];
 
 function AdminStatsContent() {
@@ -29,7 +30,9 @@ function AdminStatsContent() {
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           {tiles.map((t) => (
             <Card key={t.key}>
-              <div className="text-2xl">{t.icon}</div>
+              <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
+                <t.icon size={20} />
+              </div>
               <p className="mt-2 text-3xl font-extrabold">{stats[t.key]}</p>
               <p className="text-sm text-muted">{t.label}</p>
             </Card>

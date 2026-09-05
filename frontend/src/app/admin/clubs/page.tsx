@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { RequireRole } from '@/components/require-role';
 import { api, ApiError } from '@/lib/api';
 import { Badge, Button, Card, EmptyState, ErrorText, PageHeader, Spinner } from '@/components/ui';
+import { RatingBadge } from '@/components/star-rating';
 import type { Club, ClubStatus } from '@/types';
 
 const statusTone: Record<ClubStatus, 'default' | 'success' | 'warning' | 'danger'> = {
@@ -53,7 +54,9 @@ function AdminClubsContent() {
                 <div>
                   <p className="font-semibold">{club.name}</p>
                   <p className="text-sm text-muted">{club.address}</p>
-                  <p className="mt-1 text-xs text-muted">⭐ {club.ratingAverage.toFixed(1)} ({club.ratingCount})</p>
+                  <p className="mt-1 text-xs text-muted">
+                    <RatingBadge value={club.ratingAverage} count={club.ratingCount} size={12} />
+                  </p>
                 </div>
                 <div className="flex items-center gap-2">
                   <Badge tone={statusTone[club.status]}>{statusLabel[club.status]}</Badge>

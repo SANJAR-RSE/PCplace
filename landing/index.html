@@ -42,6 +42,7 @@
     overflow-x: hidden;
   }
   img, svg { display: block; max-width: 100%; }
+  .icon { display: inline-block; vertical-align: -0.15em; flex-shrink: 0; }
   a { color: inherit; text-decoration: none; }
   h1, h2, h3 { font-family: var(--font-heading); margin: 0; line-height: 1.15; }
   p { margin: 0; }
@@ -302,13 +303,42 @@
   </div>
 </header>
 
+<!-- Ikonkalar (bir marta ta'riflanadi, <use> orqali qayta ishlatiladi) -->
+<svg style="position:absolute; width:0; height:0; overflow:hidden" aria-hidden="true">
+  <defs>
+    <symbol id="icon-gamepad" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <line x1="6" y1="12" x2="10" y2="12"/><line x1="8" y1="10" x2="8" y2="14"/>
+      <circle cx="15" cy="13" r="1" fill="currentColor"/><circle cx="18" cy="11" r="1" fill="currentColor"/>
+      <rect x="2" y="7" width="20" height="11" rx="5"/>
+    </symbol>
+    <symbol id="icon-star" viewBox="0 0 24 24" fill="currentColor" stroke="none">
+      <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+    </symbol>
+    <symbol id="icon-map-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"/><circle cx="12" cy="10" r="3"/>
+    </symbol>
+    <symbol id="icon-zap" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/>
+    </symbol>
+    <symbol id="icon-headphones" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 14v-3a9 9 0 0 1 18 0v3"/><rect x="1" y="14" width="6" height="8" rx="2"/><rect x="17" y="14" width="6" height="8" rx="2"/>
+    </symbol>
+    <symbol id="icon-package" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M21 8l-9-5-9 5 9 5 9-5z"/><path d="M3 8v8l9 5 9-5V8"/><path d="M12 13v8"/>
+    </symbol>
+    <symbol id="icon-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+      <polyline points="20 6 9 17 4 12"/>
+    </symbol>
+  </defs>
+</svg>
+
 <main id="top">
 
   <!-- HERO -->
   <section class="hero">
     <div class="wrap hero-inner">
       <div class="hero-copy reveal in-view">
-        <span class="eyebrow">🎮 Kompyuterhonalar uchun #1 bron platformasi</span>
+        <span class="eyebrow"><svg class="icon" width="14" height="14"><use href="#icon-gamepad"/></svg> Kompyuterhonalar uchun #1 bron platformasi</span>
         <h1>O'zingizga yoqqan kompyuterhonada <span class="accent">joyni oldindan</span> bron qiling</h1>
         <p class="lead">
           Xaritadan yaqin klubni toping, bo'sh PC va xonani ko'ring, soat va snacklarni tanlab —
@@ -332,7 +362,7 @@
           </div>
           <div class="mock-row">
             <span class="mock-title">CyberZone VIP</span>
-            <span class="mock-badge">⭐ 4.8</span>
+            <span class="mock-badge"><svg class="icon" width="11" height="11"><use href="#icon-star"/></svg> 4.8</span>
           </div>
           <p class="mock-sub">VIP xona · 18 000 so'm/soat</p>
           <div class="mock-pcgrid">
@@ -362,22 +392,22 @@
 
       <div class="feature-grid">
         <div class="feature-card reveal">
-          <div class="feature-icon">🗺️</div>
+          <div class="feature-icon"><svg class="icon" width="24" height="24"><use href="#icon-map-pin"/></svg></div>
           <h3>Interaktiv xarita</h3>
           <p>Yaqiningizdagi hamkor klublarni xaritadan toping, reyting va izohlarni oldindan ko'ring.</p>
         </div>
         <div class="feature-card reveal reveal-delay-1">
-          <div class="feature-icon">⚡</div>
+          <div class="feature-icon"><svg class="icon" width="24" height="24"><use href="#icon-zap"/></svg></div>
           <h3>Real vaqt holati</h3>
           <p>Har bir PC'ning bo'sh yoki band ekanini jonli ko'ring — bekorchi kelib-ketishlarsiz.</p>
         </div>
         <div class="feature-card reveal reveal-delay-2">
-          <div class="feature-icon">🎧</div>
+          <div class="feature-icon"><svg class="icon" width="24" height="24"><use href="#icon-headphones"/></svg></div>
           <h3>VIP va umumiy xonalar</h3>
           <p>Xona turi va narxini solishtirib, o'zingizga mosini tanlang.</p>
         </div>
         <div class="feature-card reveal reveal-delay-3">
-          <div class="feature-icon">🍟</div>
+          <div class="feature-icon"><svg class="icon" width="24" height="24"><use href="#icon-package"/></svg></div>
           <h3>Snacks buyurtmasi</h3>
           <p>Lays, Cola va boshqa qo'shimchalarni bron bilan birga oldindan tanlang.</p>
         </div>
@@ -426,9 +456,9 @@
           <h2>Kompyuterhonangizni raqamlashtiring</h2>
           <p>Xona va PC'laringizni boshqaring, bronlarni real vaqtda kuzating, izohlarga javob bering.</p>
           <ul>
-            <li><span class="tick">✓</span> Xona, PC va snack narxlarini o'zingiz belgilaysiz</li>
-            <li><span class="tick">✓</span> Kelgan bronlarni bir joydan tasdiqlaysiz/yakunlaysiz</li>
-            <li><span class="tick">✓</span> Pro/Max tarif bilan batafsil statistika va yuqori ko'rinish</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Xona, PC va snack narxlarini o'zingiz belgilaysiz</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Kelgan bronlarni bir joydan tasdiqlaysiz/yakunlaysiz</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Pro/Max tarif bilan batafsil statistika va yuqori ko'rinish</li>
           </ul>
           <div class="owners-cta-row">
             <a class="btn btn-primary" href="mailto:hamkor@pcplace.uz">Klubni ulash uchun murojaat</a>
@@ -468,9 +498,9 @@
           <p class="price-sub">Boshlash uchun</p>
           <div class="price-amount">$0</div>
           <ul class="price-list">
-            <li><span class="tick">✓</span> Oyiga cheklangan bron</li>
-            <li><span class="tick">✓</span> Izoh va baho qoldirish</li>
-            <li><span class="tick">✓</span> Xarita va klub qidiruvi</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Oyiga cheklangan bron</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Izoh va baho qoldirish</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Xarita va klub qidiruvi</li>
           </ul>
           <a class="btn btn-ghost" id="register-link-free" href="#">Bepul boshlash</a>
         </div>
@@ -482,9 +512,9 @@
           <div class="price-amount">$5<span>/oy</span></div>
           <p class="price-sub" style="margin:-10px 0 18px;">yoki $27/yil</p>
           <ul class="price-list">
-            <li><span class="tick">✓</span> Cheklovsiz bron qilish</li>
-            <li><span class="tick">✓</span> Ustuvor tasdiqlash</li>
-            <li><span class="tick">✓</span> Maxsus chegirmalar</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Cheklovsiz bron qilish</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Ustuvor tasdiqlash</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Maxsus chegirmalar</li>
           </ul>
           <a class="btn btn-primary" id="register-link-pro" href="#">Pro'ni tanlash</a>
         </div>
@@ -495,9 +525,9 @@
           <div class="price-amount">$15<span>/oy</span></div>
           <p class="price-sub" style="margin:-10px 0 18px;">yoki $81/yil</p>
           <ul class="price-list">
-            <li><span class="tick">✓</span> Pro'dagi barcha imkoniyatlar</li>
-            <li><span class="tick">✓</span> VIP xonalarga ustuvor bron</li>
-            <li><span class="tick">✓</span> Shaxsiy statistika va maxsus status</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Pro'dagi barcha imkoniyatlar</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> VIP xonalarga ustuvor bron</li>
+            <li><span class="tick"><svg class="icon" width="14" height="14"><use href="#icon-check"/></svg></span> Shaxsiy statistika va maxsus status</li>
           </ul>
           <a class="btn btn-ghost" id="register-link-max" href="#">Max'ni tanlash</a>
         </div>

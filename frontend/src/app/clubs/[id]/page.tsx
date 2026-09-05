@@ -3,9 +3,11 @@
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { use, useEffect, useMemo, useState } from 'react';
+import { CheckCircle2 } from 'lucide-react';
 import { api, ApiError } from '@/lib/api';
 import { useAuth } from '@/lib/auth-context';
 import { Badge, Button, Card, EmptyState, ErrorText, Field, Input, PageHeader, Spinner } from '@/components/ui';
+import { RatingBadge, StarRow } from '@/components/star-rating';
 import type { Booking, Club, Pc, Review, Room, Snack } from '@/types';
 
 const roomTypeLabel: Record<string, string> = { vip: 'VIP xona', umumiy: 'Umumiy zal' };
@@ -132,7 +134,11 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
     <div className="mx-auto max-w-5xl px-4 py-8">
       <PageHeader
         title={club.name}
-        subtitle={`${club.address} · ⭐ ${club.ratingAverage.toFixed(1)} (${club.ratingCount} izoh)`}
+        subtitle={
+          <span className="inline-flex items-center gap-2">
+            {club.address} · <RatingBadge value={club.ratingAverage} count={club.ratingCount} size={14} />
+          </span>
+        }
       />
 
       {/* 1. Xonalar */}
@@ -186,9 +192,15 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
             </div>
           )}
           <div className="mt-3 flex gap-4 text-xs text-muted">
-            <span>🟢 bo&apos;sh</span>
-            <span>🔴 band</span>
-            <span>⚪ texnik xizmatda</span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> bo&apos;sh
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-red-500" /> band
+            </span>
+            <span className="inline-flex items-center gap-1.5">
+              <span className="h-2.5 w-2.5 rounded-full bg-border" /> texnik xizmatda
+            </span>
           </div>
         </Card>
       )}
@@ -259,11 +271,14 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
           <ErrorText>{bookingError}</ErrorText>
 
           {confirmedBooking ? (
-            <div className="mt-4 rounded-lg bg-emerald-500/10 p-4 text-sm text-emerald-700">
-              ✅ Bron muvaffaqiyatli yaratildi! To&apos;lov joyida (naqd/karta) amalga oshiriladi.{' '}
-              <Link href="/profile" className="font-semibold underline">
-                Profilimda ko&apos;rish
-              </Link>
+            <div className="mt-4 flex items-start gap-2 rounded-lg bg-emerald-500/10 p-4 text-sm text-emerald-700">
+              <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
+              <span>
+                Bron muvaffaqiyatli yaratildi! To&apos;lov joyida (naqd/karta) amalga oshiriladi.{' '}
+                <Link href="/profile" className="font-semibold underline">
+                  Profilimda ko&apos;rish
+                </Link>
+              </span>
             </div>
           ) : (
             <Button className="mt-4 w-full" disabled={bookingLoading} onClick={confirmBooking}>
@@ -282,7 +297,9 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
           <ul className="space-y-3">
             {reviews.map((rv) => (
               <li key={rv._id} className="rounded-lg border border-border p-3 text-sm">
-                <div className="mb-1 font-medium">{'⭐'.repeat(rv.rating)}</div>
+                <div className="mb-1">
+                  <StarRow value={rv.rating} />
+                </div>
                 {rv.comment && <p className="text-foreground/80">{rv.comment}</p>}
               </li>
             ))}

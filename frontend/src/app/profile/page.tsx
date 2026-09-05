@@ -1,11 +1,13 @@
 'use client';
 
 import { FormEvent, useEffect, useState } from 'react';
+import { CheckCircle2 } from 'lucide-react';
 import { RequireRole } from '@/components/require-role';
 import { useAuth } from '@/lib/auth-context';
 import { api, ApiError } from '@/lib/api';
 import { resolveBookingRefs, ResolvedRefs } from '@/lib/resolve-bookings';
 import { BookingRow } from '@/components/booking-row';
+import { StarPicker } from '@/components/star-rating';
 import { Button, Card, EmptyState, ErrorText, Field, Input, PageHeader, Spinner, Textarea } from '@/components/ui';
 import type { Booking } from '@/types';
 
@@ -36,12 +38,8 @@ function ReviewForm({ bookingId, onDone }: { bookingId: string; onDone: () => vo
   return (
     <form onSubmit={submit} className="mt-2 rounded-lg bg-border/30 p-3">
       <ErrorText>{error}</ErrorText>
-      <div className="mb-2 flex gap-1">
-        {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} type="button" onClick={() => setRating(n)} className="text-xl leading-none">
-            {n <= rating ? '⭐' : '☆'}
-          </button>
-        ))}
+      <div className="mb-2">
+        <StarPicker value={rating} onChange={setRating} />
       </div>
       <Textarea rows={2} placeholder="Izoh (ixtiyoriy)" value={comment} onChange={(e) => setComment(e.target.value)} />
       <Button type="submit" disabled={loading} className="mt-2">
@@ -56,6 +54,7 @@ function ProfileContent() {
   const [fullName, setFullName] = useState(user?.fullName ?? '');
   const [phone, setPhone] = useState(user?.phone ?? '');
   const [saveMsg, setSaveMsg] = useState('');
+  const [saveOk, setSaveOk] = useState(false);
   const [saving, setSaving] = useState(false);
 
   const [botCode, setBotCode] = useState<{ code: string; expiresInMinutes: number } | null>(null);
@@ -85,8 +84,10 @@ function ProfileContent() {
     try {
       await api.patch('/users/me', { fullName, phone: phone || undefined });
       await refreshMe();
-      setSaveMsg('Saqlandi ✅');
+      setSaveOk(true);
+      setSaveMsg('Saqlandi');
     } catch (err) {
+      setSaveOk(false);
       setSaveMsg(err instanceof ApiError ? err.message : 'Saqlashda xatolik');
     } finally {
       setSaving(false);
@@ -132,7 +133,12 @@ function ProfileContent() {
             <Button type="submit" disabled={saving}>
               {saving ? 'Saqlanmoqda…' : 'Saqlash'}
             </Button>
-            {saveMsg && <p className="mt-2 text-sm text-muted">{saveMsg}</p>}
+            {saveMsg && (
+              <p className="mt-2 inline-flex items-center gap-1 text-sm text-muted">
+                {saveOk && <CheckCircle2 size={14} className="text-emerald-600" />}
+                {saveMsg}
+              </p>
+            )}
           </form>
         </Card>
 
@@ -150,7 +156,11 @@ function ProfileContent() {
               <p className="mt-1 text-xs text-muted">{botCode.expiresInMinutes} daqiqa amal qiladi</p>
             </div>
           )}
-          {user?.telegramId && <p className="mt-3 text-sm text-emerald-600">✅ Telegram akkount bog&apos;langan</p>}
+          {user?.telegramId && (
+            <p className="mt-3 flex items-center gap-1.5 text-sm text-emerald-600">
+              <CheckCircle2 size={16} /> Telegram akkount bog&apos;langan
+            </p>
+          )}
         </Card>
       </div>
 
