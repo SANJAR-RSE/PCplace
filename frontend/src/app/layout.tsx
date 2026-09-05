@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/lib/auth-context";
-import { Navbar } from "@/components/navbar";
+import { AppShell } from "@/components/app-shell";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -27,11 +27,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
     >
       <body className="min-h-full flex flex-col">
         <AuthProvider>
-          <Navbar />
-          <main className="flex-1">{children}</main>
-          <footer className="border-t border-border py-6 text-center text-sm text-muted">
-            © {new Date().getFullYear()} PCplace
-          </footer>
+          <AppShell>{children}</AppShell>
         </AuthProvider>
       </body>
     </html>
