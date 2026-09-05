@@ -1,14 +1,18 @@
-import { ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
+import { BadRequestException, ForbiddenException, Injectable, NotFoundException } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Club, ClubDocument, ClubStatus } from '../schemas/club.schema';
+import { ClubOwner, ClubOwnerDocument } from '../schemas/club-owner.schema';
 import { CreateClubDto } from './dto/create-club.dto';
 import { UpdateClubDto } from './dto/update-club.dto';
 import { UpdateClubStatusDto } from './dto/update-club-status.dto';
 
 @Injectable()
 export class ClubsService {
-  constructor(@InjectModel(Club.name) private clubModel: Model<ClubDocument>) {}
+  constructor(
+    @InjectModel(Club.name) private clubModel: Model<ClubDocument>,
+    @InjectModel(ClubOwner.name) private clubOwnerModel: Model<ClubOwnerDocument>,
+  ) {}
 
   // Xarita/qidiruv uchun ochiq ro'yxat — faqat tasdiqlangan klublar, promo-lar birinchi.
   findAllApproved() {
@@ -35,6 +39,18 @@ export class ClubsService {
     return this.clubModel.create({ ...dto, owner: ownerId, status: ClubStatus.PENDING });
   }
 
+  // Admin nomidan klub yaratish — ko'rsatilgan klub egasiga bog'lanadi va darhol tasdiqlangan holatda ochiladi.
+  async createAsAdmin(dto: CreateClubDto) {
+    if (!dto.owner) {
+      throw new BadRequestException('Klub egasini (owner) ko\'rsatish shart');
+    }
+    const owner = await this.clubOwnerModel.findById(dto.owner);
+    if (!owner) {
+      throw new BadRequestException('Ko\'rsatilgan klub egasi topilmadi');
+    }
+    return this.clubModel.create({ ...dto, owner: dto.owner, status: ClubStatus.APPROVED });
+  }
+
   async updateOwn(ownerId: string, clubId: string, dto: UpdateClubDto) {
     const club = await this.clubModel.findById(clubId);
     if (!club) throw new NotFoundException('Kompyuterhona topilmadi');
@@ -43,6 +59,13 @@ export class ClubsService {
     }
     Object.assign(club, dto);
     return club.save();
+  }
+
+  // Admin istalgan klubni (egasidan qat'iy nazar) tahrirlashi mumkin.
+  async updateAsAdmin(clubId: string, dto: UpdateClubDto) {
+    const club = await this.clubModel.findByIdAndUpdate(clubId, dto, { new: true });
+    if (!club) throw new NotFoundException('Kompyuterhona topilmadi');
+    return club;
   }
 
   async updateStatus(clubId: string, dto: UpdateClubStatusDto) {

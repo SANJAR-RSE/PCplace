@@ -1,5 +1,5 @@
 import { Type } from 'class-transformer';
-import { IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
+import { IsMongoId, IsNumber, IsOptional, IsString, ValidateNested } from 'class-validator';
 
 class LocationDto {
   @IsNumber()
@@ -23,4 +23,9 @@ export class CreateClubDto {
   @IsOptional()
   @IsString()
   imageUrl?: string;
+
+  // Faqat admin klub yaratganda kerak — qaysi klub egasiga tegishli ekanini bildiradi.
+  @IsOptional()
+  @IsMongoId()
+  owner?: string;
 }

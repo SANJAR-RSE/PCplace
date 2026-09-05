@@ -1,11 +1,11 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { FormEvent, useEffect, useState } from 'react';
 import { RequireRole } from '@/components/require-role';
 import { api, ApiError } from '@/lib/api';
-import { Badge, Button, Card, EmptyState, ErrorText, PageHeader, Spinner } from '@/components/ui';
+import { Badge, Button, Card, EmptyState, ErrorText, Field, Input, PageHeader, Select, Spinner } from '@/components/ui';
 import { RatingBadge } from '@/components/star-rating';
-import type { Club, ClubStatus } from '@/types';
+import type { Club, ClubOwner, ClubStatus } from '@/types';
 
 const statusTone: Record<ClubStatus, 'default' | 'success' | 'warning' | 'danger'> = {
   pending: 'warning',
@@ -18,14 +18,162 @@ const statusLabel: Record<ClubStatus, string> = {
   blocked: 'Bloklangan',
 };
 
+function CreateClubForm({ owners, onCreated, onCancel }: { owners: ClubOwner[]; onCreated: () => void; onCancel: () => void }) {
+  const [name, setName] = useState('');
+  const [address, setAddress] = useState('');
+  const [lat, setLat] = useState('41.2995');
+  const [lng, setLng] = useState('69.2401');
+  const [imageUrl, setImageUrl] = useState('');
+  const [ownerId, setOwnerId] = useState(owners[0]?._id ?? '');
+  const [error, setError] = useState('');
+  const [loading, setLoading] = useState(false);
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setError('');
+    if (!ownerId) {
+      setError('Klub egasi tanlanmagan');
+      return;
+    }
+    setLoading(true);
+    try {
+      await api.post('/clubs', {
+        name,
+        address,
+        location: { lat: Number(lat), lng: Number(lng) },
+        imageUrl: imageUrl || undefined,
+        owner: ownerId,
+      });
+      onCreated();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Klub yaratilmadi');
+    } finally {
+      setLoading(false);
+    }
+  }
+
+  return (
+    <Card className="mb-6">
+      <h2 className="mb-3 font-semibold">Yangi klub qo&apos;shish</h2>
+      {owners.length === 0 ? (
+        <EmptyState title="Avval klub egasi yarating" hint="Klub ma'lum bir egaga bog'lanishi kerak — 'Klub egalari' bo'limidan qo'shing." />
+      ) : (
+        <form onSubmit={submit}>
+          <ErrorText>{error}</ErrorText>
+          <Field label="Klub egasi">
+            <Select value={ownerId} onChange={(e) => setOwnerId(e.target.value)}>
+              {owners.map((o) => (
+                <option key={o._id} value={o._id}>
+                  {o.fullName} ({o.email})
+                </option>
+              ))}
+            </Select>
+          </Field>
+          <Field label="Nomi">
+            <Input required value={name} onChange={(e) => setName(e.target.value)} />
+          </Field>
+          <Field label="Manzil">
+            <Input required value={address} onChange={(e) => setAddress(e.target.value)} />
+          </Field>
+          <div className="grid grid-cols-2 gap-3">
+            <Field label="Latitude">
+              <Input required type="number" step="any" value={lat} onChange={(e) => setLat(e.target.value)} />
+            </Field>
+            <Field label="Longitude">
+              <Input required type="number" step="any" value={lng} onChange={(e) => setLng(e.target.value)} />
+            </Field>
+          </div>
+          <Field label="Rasm URL (ixtiyoriy)">
+            <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" />
+          </Field>
+          <div className="flex gap-2">
+            <Button type="submit" disabled={loading}>
+              {loading ? 'Yaratilmoqda…' : 'Yaratish'}
+            </Button>
+            <Button type="button" variant="secondary" onClick={onCancel}>
+              Bekor qilish
+            </Button>
+          </div>
+        </form>
+      )}
+    </Card>
+  );
+}
+
+function EditClubForm({ club, onSaved, onCancel }: { club: Club; onSaved: (c: Club) => void; onCancel: () => void }) {
+  const [name, setName] = useState(club.name);
+  const [address, setAddress] = useState(club.address);
+  const [lat, setLat] = useState(String(club.location.lat));
+  const [lng, setLng] = useState(String(club.location.lng));
+  const [imageUrl, setImageUrl] = useState(club.imageUrl ?? '');
+  const [error, setError] = useState('');
+  const [saving, setSaving] = useState(false);
+
+  async function submit(e: FormEvent) {
+    e.preventDefault();
+    setError('');
+    setSaving(true);
+    try {
+      const updated = await api.patch<Club>(`/clubs/${club._id}`, {
+        name,
+        address,
+        location: { lat: Number(lat), lng: Number(lng) },
+        imageUrl: imageUrl || undefined,
+      });
+      onSaved(updated);
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Saqlab bo‘lmadi');
+    } finally {
+      setSaving(false);
+    }
+  }
+
+  return (
+    <form onSubmit={submit} className="mt-3 rounded-lg bg-border/30 p-3">
+      <ErrorText>{error}</ErrorText>
+      <Field label="Nomi">
+        <Input required value={name} onChange={(e) => setName(e.target.value)} />
+      </Field>
+      <Field label="Manzil">
+        <Input required value={address} onChange={(e) => setAddress(e.target.value)} />
+      </Field>
+      <div className="grid grid-cols-2 gap-3">
+        <Field label="Latitude">
+          <Input required type="number" step="any" value={lat} onChange={(e) => setLat(e.target.value)} />
+        </Field>
+        <Field label="Longitude">
+          <Input required type="number" step="any" value={lng} onChange={(e) => setLng(e.target.value)} />
+        </Field>
+      </div>
+      <Field label="Rasm URL">
+        <Input value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} placeholder="https://…" />
+      </Field>
+      <div className="flex gap-2">
+        <Button type="submit" disabled={saving}>
+          {saving ? 'Saqlanmoqda…' : 'Saqlash'}
+        </Button>
+        <Button type="button" variant="secondary" onClick={onCancel}>
+          Bekor qilish
+        </Button>
+      </div>
+    </form>
+  );
+}
+
 function AdminClubsContent() {
   const [clubs, setClubs] = useState<Club[] | null>(null);
+  const [owners, setOwners] = useState<ClubOwner[]>([]);
   const [error, setError] = useState('');
+  const [showCreate, setShowCreate] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
 
   function load() {
     api.get<Club[]>('/clubs/all').then(setClubs).catch(() => setClubs([]));
   }
   useEffect(load, []);
+  useEffect(() => {
+    api.get<ClubOwner[]>('/club-owners').then(setOwners).catch(() => setOwners([]));
+  }, []);
 
   async function setStatus(id: string, status: ClubStatus) {
     setError('');
@@ -39,8 +187,27 @@ function AdminClubsContent() {
 
   return (
     <div className="mx-auto max-w-4xl px-4 py-8">
-      <PageHeader title="Klublar" subtitle="Yangi klublarni tasdiqlang yoki qoidabuzarlarni bloklang." />
+      <PageHeader
+        title="Klublar"
+        subtitle="Yangi klublarni tasdiqlang, tahrirlang yoki qoidabuzarlarni bloklang."
+        action={
+          <Button variant="secondary" onClick={() => setShowCreate((v) => !v)}>
+            {showCreate ? 'Bekor qilish' : "+ Yangi klub"}
+          </Button>
+        }
+      />
       <ErrorText>{error}</ErrorText>
+
+      {showCreate && (
+        <CreateClubForm
+          owners={owners}
+          onCreated={() => {
+            setShowCreate(false);
+            load();
+          }}
+          onCancel={() => setShowCreate(false)}
+        />
+      )}
 
       {clubs === null ? (
         <Spinner />
@@ -68,8 +235,22 @@ function AdminClubsContent() {
                       Bloklash
                     </Button>
                   )}
+                  <Button variant="secondary" onClick={() => setEditingId(editingId === club._id ? null : club._id)}>
+                    {editingId === club._id ? 'Yopish' : 'Tahrirlash'}
+                  </Button>
                 </div>
               </div>
+
+              {editingId === club._id && (
+                <EditClubForm
+                  club={club}
+                  onCancel={() => setEditingId(null)}
+                  onSaved={(updated) => {
+                    setClubs((prev) => (prev ? prev.map((c) => (c._id === updated._id ? updated : c)) : prev));
+                    setEditingId(null);
+                  }}
+                />
+              )}
             </Card>
           ))}
         </div>

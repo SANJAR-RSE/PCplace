@@ -40,17 +40,26 @@ export class ClubsController {
     return this.clubsService.findById(id);
   }
 
+  // Klub egasi o'ziniki uchun (status: pending) yaratadi; admin istalgan egaga
+  // bog'lab, darhol tasdiqlangan holatda yaratishi mumkin (dto.owner orqali).
   @UseGuards(RolesGuard)
-  @Roles(Role.CLUB_OWNER)
+  @Roles(Role.CLUB_OWNER, Role.ADMIN)
   @Post()
   create(@CurrentUser() user: CurrentUserPayload, @Body() dto: CreateClubDto) {
+    if (user.role === Role.ADMIN) {
+      return this.clubsService.createAsAdmin(dto);
+    }
     return this.clubsService.create(user.sub, dto);
   }
 
+  // Klub egasi faqat o'zinikini tahrirlaydi; admin istalgan klubni tahrirlashi mumkin.
   @UseGuards(RolesGuard)
-  @Roles(Role.CLUB_OWNER)
+  @Roles(Role.CLUB_OWNER, Role.ADMIN)
   @Patch(':id')
   updateOwn(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string, @Body() dto: UpdateClubDto) {
+    if (user.role === Role.ADMIN) {
+      return this.clubsService.updateAsAdmin(id, dto);
+    }
     return this.clubsService.updateOwn(user.sub, id, dto);
   }
 
