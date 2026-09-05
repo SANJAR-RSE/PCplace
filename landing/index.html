@@ -1,0 +1,591 @@
+<!doctype html>
+<html lang="uz">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>PCplace — kompyuterhonada joy bron qiling</title>
+<meta name="description" content="PCplace — kompyuterhonalarda xona, PC va vaqtni oldindan bron qilish platformasi. Xaritadan klub tanlang, navbatsiz o'ynang." />
+
+<!-- Web sayt (Next.js ilova) manzili — production'ga chiqishda shu qatorni yangilang. -->
+<script>
+  const APP_URL = 'http://localhost:3000';
+</script>
+
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=Sora:wght@600;700;800&display=swap" rel="stylesheet" />
+
+<style>
+  :root {
+    --bg: #f6f5ff;
+    --surface: #ffffff;
+    --ink: #16152b;
+    --muted: #625f7a;
+    --border: #e7e4fb;
+    --primary: #6c4bff;
+    --primary-dark: #5636e0;
+    --accent: #17c3a2;
+    --warn: #ff9f43;
+    --radius: 20px;
+    --font-heading: 'Sora', 'Manrope', system-ui, sans-serif;
+    --font-body: 'Manrope', system-ui, sans-serif;
+  }
+
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: var(--font-body);
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+  img, svg { display: block; max-width: 100%; }
+  a { color: inherit; text-decoration: none; }
+  h1, h2, h3 { font-family: var(--font-heading); margin: 0; line-height: 1.15; }
+  p { margin: 0; }
+  .wrap { max-width: 1160px; margin: 0 auto; padding: 0 24px; }
+  section { position: relative; }
+
+  /* ---------- Reveal-on-scroll ---------- */
+  .reveal { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .reveal.in-view { opacity: 1; transform: translateY(0); }
+  .reveal-delay-1.in-view { transition-delay: .1s; }
+  .reveal-delay-2.in-view { transition-delay: .2s; }
+  .reveal-delay-3.in-view { transition-delay: .3s; }
+
+  /* ---------- Nav ---------- */
+  .nav {
+    position: sticky; top: 0; z-index: 50;
+    background: rgba(246,245,255,0.75);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid transparent;
+    transition: border-color .3s ease, box-shadow .3s ease;
+  }
+  .nav.scrolled { border-color: var(--border); box-shadow: 0 6px 24px rgba(20,10,60,.06); }
+  .nav-inner { display: flex; align-items: center; justify-content: space-between; padding: 16px 24px; max-width: 1160px; margin: 0 auto; }
+  .brand { display: flex; align-items: center; gap: 10px; font-family: var(--font-heading); font-weight: 800; font-size: 1.25rem; }
+  .brand-mark {
+    width: 36px; height: 36px; border-radius: 11px;
+    background: linear-gradient(135deg, var(--primary), var(--accent));
+    display: grid; place-items: center; color: #fff; font-weight: 800;
+    box-shadow: 0 8px 20px rgba(108,75,255,.35);
+  }
+  .nav-links { display: flex; gap: 28px; font-weight: 600; font-size: .95rem; color: var(--muted); }
+  .nav-links a { transition: color .2s ease; }
+  .nav-links a:hover { color: var(--primary); }
+  .nav-cta { display: flex; align-items: center; gap: 10px; }
+  .nav-toggle { display: none; flex-direction: column; gap: 4px; background: none; border: none; cursor: pointer; padding: 8px; }
+  .nav-toggle span { width: 22px; height: 2px; background: var(--ink); border-radius: 2px; }
+  .mobile-menu { display: none; flex-direction: column; gap: 4px; padding: 8px 24px 20px; }
+  .mobile-menu a { padding: 10px 0; font-weight: 600; color: var(--muted); border-bottom: 1px solid var(--border); }
+  .mobile-menu.open { display: flex; }
+
+  /* ---------- Buttons ---------- */
+  .btn {
+    display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 12px 22px; border-radius: 999px; font-weight: 700; font-size: .95rem;
+    cursor: pointer; border: none; transition: transform .2s ease, box-shadow .2s ease, background .2s ease;
+    white-space: nowrap;
+  }
+  .btn:hover { transform: translateY(-2px); }
+  .btn-primary { background: var(--primary); color: #fff; box-shadow: 0 10px 24px rgba(108,75,255,.35); }
+  .btn-primary:hover { background: var(--primary-dark); }
+  .btn-ghost { background: transparent; color: var(--ink); border: 1.5px solid var(--border); }
+  .btn-ghost:hover { border-color: var(--primary); color: var(--primary); }
+  .btn-lg { padding: 16px 30px; font-size: 1.05rem; }
+
+  /* ---------- Hero ---------- */
+  .hero { padding: 96px 0 60px; overflow: hidden; }
+  .hero-inner { display: grid; grid-template-columns: 1.1fr 1fr; gap: 56px; align-items: center; }
+  .eyebrow {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: #fff; border: 1px solid var(--border); border-radius: 999px;
+    padding: 6px 14px; font-size: .8rem; font-weight: 700; color: var(--primary);
+    box-shadow: 0 6px 16px rgba(20,10,60,.05);
+  }
+  .hero h1 { font-size: clamp(2.2rem, 4.5vw, 3.4rem); font-weight: 800; margin: 20px 0 18px; letter-spacing: -0.02em; }
+  .hero h1 .accent { background: linear-gradient(135deg, var(--primary), var(--accent)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .hero p.lead { font-size: 1.1rem; color: var(--muted); max-width: 480px; }
+  .hero-actions { display: flex; gap: 14px; margin-top: 32px; flex-wrap: wrap; }
+  .hero-note { margin-top: 18px; font-size: .85rem; color: var(--muted); }
+
+  /* Hero visual: mock booking card */
+  .hero-visual { position: relative; height: 420px; }
+  .blob { position: absolute; border-radius: 50%; filter: blur(4px); opacity: .55; animation: float 8s ease-in-out infinite; }
+  .blob-1 { width: 220px; height: 220px; background: radial-gradient(circle at 30% 30%, var(--accent), transparent 70%); top: -20px; right: 10px; animation-delay: 0s; }
+  .blob-2 { width: 180px; height: 180px; background: radial-gradient(circle at 30% 30%, var(--primary), transparent 70%); bottom: 0; left: 0; animation-delay: 2s; }
+  @keyframes float { 0%,100% { transform: translateY(0) scale(1); } 50% { transform: translateY(-18px) scale(1.04); } }
+
+  .mock-card {
+    position: relative; z-index: 2; width: 300px; margin: 0 auto;
+    background: var(--surface); border-radius: 24px; padding: 22px;
+    box-shadow: 0 30px 60px rgba(20,10,60,.18); border: 1px solid var(--border);
+    animation: rise 6s ease-in-out infinite;
+  }
+  @keyframes rise { 0%,100% { transform: translateY(0) rotate(-1.2deg); } 50% { transform: translateY(-12px) rotate(1deg); } }
+  .mock-map { height: 110px; border-radius: 16px; background:
+      linear-gradient(135deg, #eef0ff, #e4fbf5);
+    position: relative; overflow: hidden; margin-bottom: 14px; }
+  .mock-pin { position: absolute; width: 14px; height: 14px; background: var(--primary); border-radius: 50% 50% 50% 0; transform: rotate(-45deg); box-shadow: 0 0 0 6px rgba(108,75,255,.15); }
+  .mock-pin.p1 { top: 30px; left: 40px; }
+  .mock-pin.p2 { top: 55px; left: 130px; background: var(--accent); box-shadow: 0 0 0 6px rgba(23,195,162,.15); }
+  .mock-pin.p3 { top: 20px; left: 210px; }
+  .mock-row { display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; }
+  .mock-title { font-weight: 700; font-size: .95rem; }
+  .mock-badge { background: #eafaf3; color: #0f9d76; font-size: .72rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+  .mock-sub { color: var(--muted); font-size: .8rem; margin-bottom: 14px; }
+  .mock-pcgrid { display: grid; grid-template-columns: repeat(5, 1fr); gap: 6px; margin-bottom: 14px; }
+  .mock-pc { aspect-ratio: 1; border-radius: 8px; background: #eafaf3; }
+  .mock-pc.busy { background: #fdeaea; }
+  .mock-total { display: flex; justify-content: space-between; align-items: center; padding-top: 12px; border-top: 1px dashed var(--border); }
+  .mock-total b { font-family: var(--font-heading); font-size: 1.1rem; }
+  .mock-cta { margin-top: 12px; width: 100%; background: var(--primary); color: #fff; border: none; border-radius: 12px; padding: 11px; font-weight: 700; font-size: .85rem; }
+
+  /* ---------- Section heading ---------- */
+  .section-head { text-align: center; max-width: 620px; margin: 0 auto 52px; }
+  .section-head .eyebrow { margin-bottom: 16px; }
+  .section-head h2 { font-size: clamp(1.7rem, 3vw, 2.3rem); margin-bottom: 14px; }
+  .section-head p { color: var(--muted); font-size: 1.05rem; }
+
+  /* ---------- Features ---------- */
+  .features { padding: 90px 0; }
+  .feature-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+  .feature-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 28px 22px; transition: transform .25s ease, box-shadow .25s ease, border-color .25s ease;
+  }
+  .feature-card:hover { transform: translateY(-6px); box-shadow: 0 20px 40px rgba(20,10,60,.1); border-color: var(--primary); }
+  .feature-icon {
+    width: 48px; height: 48px; border-radius: 14px; display: grid; place-items: center;
+    background: linear-gradient(135deg, rgba(108,75,255,.14), rgba(23,195,162,.14));
+    font-size: 22px; margin-bottom: 16px;
+  }
+  .feature-card h3 { font-size: 1.05rem; margin-bottom: 8px; }
+  .feature-card p { color: var(--muted); font-size: .92rem; }
+
+  /* ---------- How it works ---------- */
+  .how { padding: 90px 0; background: var(--surface); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .steps { display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px; counter-reset: step; }
+  .step { position: relative; padding: 28px 20px 20px; border: 1px dashed var(--border); border-radius: var(--radius); }
+  .step-num {
+    width: 34px; height: 34px; border-radius: 50%; background: var(--ink); color: #fff;
+    display: grid; place-items: center; font-weight: 800; font-family: var(--font-heading);
+    margin-bottom: 16px;
+  }
+  .step:nth-child(1) .step-num { background: var(--primary); }
+  .step:nth-child(2) .step-num { background: var(--accent); }
+  .step:nth-child(3) .step-num { background: var(--warn); }
+  .step:nth-child(4) .step-num { background: var(--primary-dark); }
+  .step h3 { font-size: 1rem; margin-bottom: 6px; }
+  .step p { color: var(--muted); font-size: .88rem; }
+
+  /* ---------- Owners ---------- */
+  .owners { padding: 100px 0; }
+  .owners-inner {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 40px; align-items: center;
+    background: linear-gradient(135deg, #191735, #2b1f63);
+    color: #fff; border-radius: 28px; padding: 56px; overflow: hidden; position: relative;
+  }
+  .owners-inner::before {
+    content: ''; position: absolute; width: 360px; height: 360px; border-radius: 50%;
+    background: radial-gradient(circle, rgba(23,195,162,.35), transparent 70%);
+    top: -120px; right: -80px;
+  }
+  .owners h2 { font-size: clamp(1.6rem, 3vw, 2.1rem); margin-bottom: 16px; }
+  .owners p { color: rgba(255,255,255,.75); font-size: 1rem; margin-bottom: 14px; }
+  .owners ul { list-style: none; padding: 0; margin: 22px 0; display: grid; gap: 10px; }
+  .owners li { display: flex; gap: 10px; align-items: flex-start; font-size: .92rem; color: rgba(255,255,255,.9); }
+  .owners li .tick { color: var(--accent); font-weight: 800; }
+  .owners-cta-row { display: flex; gap: 14px; flex-wrap: wrap; }
+  .owners-visual { position: relative; z-index: 1; }
+  .stat-card {
+    background: rgba(255,255,255,.08); border: 1px solid rgba(255,255,255,.15);
+    border-radius: 18px; padding: 20px; backdrop-filter: blur(6px); margin-bottom: 14px;
+  }
+  .stat-card b { display: block; font-family: var(--font-heading); font-size: 1.4rem; }
+  .stat-card span { color: rgba(255,255,255,.65); font-size: .85rem; }
+
+  /* ---------- Pricing ---------- */
+  .pricing { padding: 90px 0; }
+  .price-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 22px; align-items: stretch; }
+  .price-card {
+    background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
+    padding: 32px 26px; display: flex; flex-direction: column;
+    transition: transform .25s ease, box-shadow .25s ease;
+  }
+  .price-card:hover { transform: translateY(-6px); box-shadow: 0 24px 46px rgba(20,10,60,.1); }
+  .price-card.featured { border: 2px solid var(--primary); position: relative; }
+  .price-tag {
+    position: absolute; top: -14px; left: 50%; transform: translateX(-50%);
+    background: var(--primary); color: #fff; font-size: .72rem; font-weight: 800;
+    padding: 5px 14px; border-radius: 999px; letter-spacing: .04em;
+  }
+  .price-card h3 { font-size: 1.2rem; margin-bottom: 6px; }
+  .price-card .price-sub { color: var(--muted); font-size: .85rem; margin-bottom: 18px; }
+  .price-amount { font-family: var(--font-heading); font-size: 2.1rem; font-weight: 800; margin-bottom: 4px; }
+  .price-amount span { font-size: .95rem; font-weight: 600; color: var(--muted); }
+  .price-list { list-style: none; padding: 0; margin: 22px 0; display: grid; gap: 10px; flex: 1; }
+  .price-list li { display: flex; gap: 8px; font-size: .9rem; color: var(--muted); }
+  .price-list li .tick { color: var(--accent); font-weight: 800; }
+
+  /* ---------- CTA banner ---------- */
+  .cta-banner { padding: 90px 0; text-align: center; }
+  .cta-box {
+    background: linear-gradient(135deg, var(--primary), #8f6bff 60%, var(--accent));
+    border-radius: 28px; padding: 64px 32px; color: #fff; position: relative; overflow: hidden;
+  }
+  .cta-box h2 { font-size: clamp(1.7rem, 3.4vw, 2.4rem); margin-bottom: 14px; }
+  .cta-box p { color: rgba(255,255,255,.85); max-width: 480px; margin: 0 auto 30px; }
+  .cta-box .btn-ghost { background: rgba(255,255,255,.12); color: #fff; border-color: rgba(255,255,255,.4); }
+  .cta-box .btn-ghost:hover { background: rgba(255,255,255,.2); color: #fff; }
+  .cta-box .btn-primary { background: #fff; color: var(--primary-dark); box-shadow: 0 10px 30px rgba(0,0,0,.15); }
+  .cta-box .btn-primary:hover { background: #f2f1ff; }
+
+  /* ---------- Footer ---------- */
+  footer { padding: 56px 0 28px; border-top: 1px solid var(--border); }
+  .footer-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1fr; gap: 32px; margin-bottom: 40px; }
+  .footer-brand p { color: var(--muted); font-size: .9rem; margin-top: 12px; max-width: 260px; }
+  .footer-col h4 { font-size: .85rem; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-bottom: 14px; }
+  .footer-col a { display: block; color: var(--ink); font-size: .9rem; margin-bottom: 10px; opacity: .8; transition: opacity .2s ease, color .2s ease; }
+  .footer-col a:hover { opacity: 1; color: var(--primary); }
+  .footer-bottom { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding-top: 24px; border-top: 1px solid var(--border); color: var(--muted); font-size: .82rem; }
+
+  /* ---------- Responsive ---------- */
+  @media (max-width: 960px) {
+    .hero-inner { grid-template-columns: 1fr; }
+    .hero-visual { height: 380px; }
+    .feature-grid { grid-template-columns: repeat(2, 1fr); }
+    .steps { grid-template-columns: repeat(2, 1fr); }
+    .owners-inner { grid-template-columns: 1fr; padding: 40px 28px; }
+    .price-grid { grid-template-columns: 1fr; max-width: 380px; margin: 0 auto; }
+    .footer-grid { grid-template-columns: 1fr 1fr; }
+  }
+  @media (max-width: 720px) {
+    .nav-links { display: none; }
+    .nav-cta .btn-ghost { display: none; }
+    .nav-toggle { display: flex; }
+    .feature-grid, .steps { grid-template-columns: 1fr; }
+    .footer-grid { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<header class="nav" id="nav">
+  <div class="nav-inner">
+    <a href="#top" class="brand">
+      <span class="brand-mark">P</span>
+      PCplace
+    </a>
+    <nav class="nav-links">
+      <a href="#features">Xususiyatlar</a>
+      <a href="#how">Qanday ishlaydi</a>
+      <a href="#owners">Klub egalari uchun</a>
+      <a href="#pricing">Narxlar</a>
+    </nav>
+    <div class="nav-cta">
+      <a class="btn btn-ghost" id="login-link" href="#">Kirish</a>
+      <a class="btn btn-primary" id="register-link-nav" href="#">Ro'yxatdan o'tish</a>
+      <button class="nav-toggle" id="nav-toggle" aria-label="Menyu">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </div>
+  <div class="mobile-menu" id="mobile-menu">
+    <a href="#features">Xususiyatlar</a>
+    <a href="#how">Qanday ishlaydi</a>
+    <a href="#owners">Klub egalari uchun</a>
+    <a href="#pricing">Narxlar</a>
+    <a href="#" id="login-link-mobile">Kirish</a>
+  </div>
+</header>
+
+<main id="top">
+
+  <!-- HERO -->
+  <section class="hero">
+    <div class="wrap hero-inner">
+      <div class="hero-copy reveal in-view">
+        <span class="eyebrow">🎮 Kompyuterhonalar uchun #1 bron platformasi</span>
+        <h1>O'zingizga yoqqan kompyuterhonada <span class="accent">joyni oldindan</span> bron qiling</h1>
+        <p class="lead">
+          Xaritadan yaqin klubni toping, bo'sh PC va xonani ko'ring, soat va snacklarni tanlab —
+          bir necha soniyada bron qiling. Navbatda turishga hojat yo'q.
+        </p>
+        <div class="hero-actions">
+          <a class="btn btn-primary btn-lg" id="register-link-hero" href="#">Bepul boshlash →</a>
+          <a class="btn btn-ghost btn-lg" href="#how">Qanday ishlaydi</a>
+        </div>
+        <p class="hero-note">To'lov joyida naqd/karta orqali — oldindan bron uchun hech narsa to'lamaysiz.</p>
+      </div>
+
+      <div class="hero-visual reveal reveal-delay-2 in-view">
+        <div class="blob blob-1"></div>
+        <div class="blob blob-2"></div>
+        <div class="mock-card">
+          <div class="mock-map">
+            <span class="mock-pin p1"></span>
+            <span class="mock-pin p2"></span>
+            <span class="mock-pin p3"></span>
+          </div>
+          <div class="mock-row">
+            <span class="mock-title">CyberZone VIP</span>
+            <span class="mock-badge">⭐ 4.8</span>
+          </div>
+          <p class="mock-sub">VIP xona · 18 000 so'm/soat</p>
+          <div class="mock-pcgrid">
+            <div class="mock-pc"></div><div class="mock-pc"></div><div class="mock-pc busy"></div>
+            <div class="mock-pc"></div><div class="mock-pc"></div><div class="mock-pc"></div>
+            <div class="mock-pc busy"></div><div class="mock-pc"></div><div class="mock-pc"></div>
+            <div class="mock-pc"></div>
+          </div>
+          <div class="mock-total">
+            <span style="color:var(--muted); font-size:.82rem;">2 soat + Cola</span>
+            <b>46 000 so'm</b>
+          </div>
+          <button class="mock-cta">Bronni tasdiqlash</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- FEATURES -->
+  <section id="features" class="features">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Xususiyatlar</span>
+        <h2>Bron qilish uchun kerakli hamma narsa — bitta ilovada</h2>
+        <p>Xaritadan qidiruvdan tortib, snack buyurtmasigacha — butun jarayon shaffof va tez.</p>
+      </div>
+
+      <div class="feature-grid">
+        <div class="feature-card reveal">
+          <div class="feature-icon">🗺️</div>
+          <h3>Interaktiv xarita</h3>
+          <p>Yaqiningizdagi hamkor klublarni xaritadan toping, reyting va izohlarni oldindan ko'ring.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-1">
+          <div class="feature-icon">⚡</div>
+          <h3>Real vaqt holati</h3>
+          <p>Har bir PC'ning bo'sh yoki band ekanini jonli ko'ring — bekorchi kelib-ketishlarsiz.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-2">
+          <div class="feature-icon">🎧</div>
+          <h3>VIP va umumiy xonalar</h3>
+          <p>Xona turi va narxini solishtirib, o'zingizga mosini tanlang.</p>
+        </div>
+        <div class="feature-card reveal reveal-delay-3">
+          <div class="feature-icon">🍟</div>
+          <h3>Snacks buyurtmasi</h3>
+          <p>Lays, Cola va boshqa qo'shimchalarni bron bilan birga oldindan tanlang.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- HOW IT WORKS -->
+  <section id="how" class="how">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Jarayon</span>
+        <h2>4 qadamda o'ynashni boshlang</h2>
+      </div>
+      <div class="steps">
+        <div class="step reveal">
+          <div class="step-num">1</div>
+          <h3>Ro'yxatdan o'ting</h3>
+          <p>Web saytda bepul akkount yarating — bir necha soniya.</p>
+        </div>
+        <div class="step reveal reveal-delay-1">
+          <div class="step-num">2</div>
+          <h3>Klub tanlang</h3>
+          <p>Xaritadan yaqin klubni toping, reyting va narxlarni solishtiring.</p>
+        </div>
+        <div class="step reveal reveal-delay-2">
+          <div class="step-num">3</div>
+          <h3>Bron qiling</h3>
+          <p>PC, soat va snacklarni tanlab, narxni ko'ring va tasdiqlang.</p>
+        </div>
+        <div class="step reveal reveal-delay-3">
+          <div class="step-num">4</div>
+          <h3>Kelib o'ynang</h3>
+          <p>Joyingiz tayyor turibdi — to'lovni joyida amalga oshirasiz.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OWNERS -->
+  <section id="owners" class="owners">
+    <div class="wrap">
+      <div class="owners-inner">
+        <div class="owners-copy reveal">
+          <span class="eyebrow" style="background: rgba(255,255,255,.1); color:#fff; border-color: rgba(255,255,255,.2);">Klub egalari uchun</span>
+          <h2>Kompyuterhonangizni raqamlashtiring</h2>
+          <p>Xona va PC'laringizni boshqaring, bronlarni real vaqtda kuzating, izohlarga javob bering.</p>
+          <ul>
+            <li><span class="tick">✓</span> Xona, PC va snack narxlarini o'zingiz belgilaysiz</li>
+            <li><span class="tick">✓</span> Kelgan bronlarni bir joydan tasdiqlaysiz/yakunlaysiz</li>
+            <li><span class="tick">✓</span> Pro/Max tarif bilan batafsil statistika va yuqori ko'rinish</li>
+          </ul>
+          <div class="owners-cta-row">
+            <a class="btn btn-primary" href="mailto:hamkor@pcplace.uz">Klubni ulash uchun murojaat</a>
+            <a class="btn btn-ghost" style="border-color: rgba(255,255,255,.4); color:#fff;" id="owner-login-link" href="#">Egalar uchun kirish</a>
+          </div>
+        </div>
+        <div class="owners-visual reveal reveal-delay-2">
+          <div class="stat-card">
+            <b>Xona · PC · Snacks</b>
+            <span>Bittа panelda to'liq boshqaruv</span>
+          </div>
+          <div class="stat-card">
+            <b>Tasdiqlash → Yakunlash</b>
+            <span>Bronlar uchun aniq holat oqimi</span>
+          </div>
+          <div class="stat-card">
+            <b>Pro / Max</b>
+            <span>Kengaytirilgan analitika va reklama imkoniyati</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- PRICING -->
+  <section id="pricing" class="pricing">
+    <div class="wrap">
+      <div class="section-head reveal">
+        <span class="eyebrow">Narxlar</span>
+        <h2>Bepul boshlang, xohlaganda kengaytiring</h2>
+        <p>User va klub egalari uchun bir xil tariflar — funksiyalar rolga qarab farqlanadi.</p>
+      </div>
+
+      <div class="price-grid">
+        <div class="price-card reveal">
+          <h3>Free</h3>
+          <p class="price-sub">Boshlash uchun</p>
+          <div class="price-amount">$0</div>
+          <ul class="price-list">
+            <li><span class="tick">✓</span> Oyiga cheklangan bron</li>
+            <li><span class="tick">✓</span> Izoh va baho qoldirish</li>
+            <li><span class="tick">✓</span> Xarita va klub qidiruvi</li>
+          </ul>
+          <a class="btn btn-ghost" id="register-link-free" href="#">Bepul boshlash</a>
+        </div>
+
+        <div class="price-card featured reveal reveal-delay-1">
+          <span class="price-tag">MASHHUR</span>
+          <h3>Pro</h3>
+          <p class="price-sub">Faol o'yinchular uchun</p>
+          <div class="price-amount">$10<span>/oy</span></div>
+          <p class="price-sub" style="margin:-10px 0 18px;">yoki $54/yil</p>
+          <ul class="price-list">
+            <li><span class="tick">✓</span> Cheklovsiz bron qilish</li>
+            <li><span class="tick">✓</span> Ustuvor tasdiqlash</li>
+            <li><span class="tick">✓</span> Maxsus chegirmalar</li>
+          </ul>
+          <a class="btn btn-primary" id="register-link-pro" href="#">Pro'ni tanlash</a>
+        </div>
+
+        <div class="price-card reveal reveal-delay-2">
+          <h3>Max</h3>
+          <p class="price-sub">Eng ko'p imkoniyat</p>
+          <div class="price-amount">$10<span>/oy</span></div>
+          <p class="price-sub" style="margin:-10px 0 18px;">yoki $54/yil</p>
+          <ul class="price-list">
+            <li><span class="tick">✓</span> Pro'dagi barcha imkoniyatlar</li>
+            <li><span class="tick">✓</span> VIP xonalarga ustuvor bron</li>
+            <li><span class="tick">✓</span> Shaxsiy statistika va maxsus status</li>
+          </ul>
+          <a class="btn btn-ghost" id="register-link-max" href="#">Max'ni tanlash</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BANNER -->
+  <section class="cta-banner">
+    <div class="wrap">
+      <div class="cta-box reveal">
+        <h2>Navbatda turishni unuting</h2>
+        <p>Hoziroq ro'yxatdan o'ting va birinchi bronni bir necha daqiqada amalga oshiring.</p>
+        <a class="btn btn-primary btn-lg" id="register-link-banner" href="#">Ro'yxatdan o'tish — bepul</a>
+      </div>
+    </div>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    <div class="footer-grid">
+      <div class="footer-brand">
+        <a href="#top" class="brand">
+          <span class="brand-mark">P</span>
+          PCplace
+        </a>
+        <p>Kompyuterhonalarda joy va vaqtni oldindan bron qilish platformasi.</p>
+      </div>
+      <div class="footer-col">
+        <h4>Mahsulot</h4>
+        <a href="#features">Xususiyatlar</a>
+        <a href="#how">Qanday ishlaydi</a>
+        <a href="#pricing">Narxlar</a>
+      </div>
+      <div class="footer-col">
+        <h4>Foydalanuvchilar</h4>
+        <a href="#" id="footer-register">Ro'yxatdan o'tish</a>
+        <a href="#" id="footer-login">Kirish</a>
+      </div>
+      <div class="footer-col">
+        <h4>Aloqa</h4>
+        <a href="mailto:hamkor@pcplace.uz">hamkor@pcplace.uz</a>
+        <a href="#owners">Klub egalari uchun</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year"></span> PCplace. Barcha huquqlar himoyalangan.</span>
+      <span>Toshkent, O'zbekiston</span>
+    </div>
+  </div>
+</footer>
+
+<script>
+  // --- Ro'yxatdan o'tish/kirish tugmalarini web ilova manziliga bog'lash ---
+  document.querySelectorAll('#register-link-nav, #register-link-hero, #register-link-free, #register-link-pro, #register-link-max, #register-link-banner, #footer-register')
+    .forEach((el) => { el.href = `${APP_URL}/register`; });
+  document.querySelectorAll('#login-link, #login-link-mobile, #owner-login-link, #footer-login')
+    .forEach((el) => { el.href = `${APP_URL}/login`; });
+
+  // --- Mobil menyu ---
+  const navToggle = document.getElementById('nav-toggle');
+  const mobileMenu = document.getElementById('mobile-menu');
+  navToggle.addEventListener('click', () => mobileMenu.classList.toggle('open'));
+  mobileMenu.querySelectorAll('a').forEach((a) => a.addEventListener('click', () => mobileMenu.classList.remove('open')));
+
+  // --- Scroll paytida nav soyasi ---
+  const nav = document.getElementById('nav');
+  window.addEventListener('scroll', () => {
+    nav.classList.toggle('scrolled', window.scrollY > 8);
+  });
+
+  // --- Scroll-reveal animatsiyasi ---
+  const revealEls = document.querySelectorAll('.reveal:not(.in-view)');
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach((entry) => {
+      if (entry.isIntersecting) {
+        entry.target.classList.add('in-view');
+        observer.unobserve(entry.target);
+      }
+    });
+  }, { threshold: 0.15 });
+  revealEls.forEach((el) => observer.observe(el));
+
+  // --- Footer yili ---
+  document.getElementById('year').textContent = new Date().getFullYear();
+</script>
+
+</body>
+</html>

@@ -1,0 +1,35 @@
+# Environment
+.env
+.env.local
+.env.*.local
+
+# Node
+node_modules/
+dist/
+build/
+coverage/
+*.log
+npm-debug.log*
+
+# Backend (NestJS)
+backend/dist/
+backend/node_modules/
+
+# Frontend (Next.js) - future
+frontend/.next/
+frontend/node_modules/
+frontend/out/
+
+# Telegram bot (Python)
+telegram-bot/__pycache__/
+telegram-bot/**/__pycache__/
+telegram-bot/venv/
+telegram-bot/.venv/
+telegram-bot/*.pyc
+telegram-bot/sessions.json
+
+# OS / editor
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
