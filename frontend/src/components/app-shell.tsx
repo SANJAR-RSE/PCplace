@@ -43,8 +43,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
       {drawerOpen && (
         <div className="fixed inset-0 z-50 md:hidden">
-          <div className="absolute inset-0 bg-black/40" onClick={() => setDrawerOpen(false)} />
-          <div className="absolute inset-y-0 left-0 w-72 max-w-[80vw] bg-surface shadow-xl">
+          <div
+            className="absolute inset-0 bg-black/40"
+            style={{ animation: 'overlay-in 0.2s ease-out' }}
+            onClick={() => setDrawerOpen(false)}
+          />
+          <div
+            className="absolute inset-x-0 bottom-0 max-h-[85vh] overflow-y-auto rounded-t-2xl bg-surface pb-[env(safe-area-inset-bottom)] shadow-2xl"
+            style={{ animation: 'sheet-in 0.25s ease-out' }}
+          >
+            <div className="flex justify-center pt-2.5">
+              <span className="h-1.5 w-10 rounded-full bg-border" />
+            </div>
             <SidebarContent onNavigate={() => setDrawerOpen(false)} />
           </div>
         </div>
