@@ -8,7 +8,7 @@ import { Badge, Button, Card, EmptyState, ErrorText, Field, Input, PageHeader, S
 import type { Club, Pc, PcStatus, Room, RoomType, Snack } from '@/types';
 
 const roomTypeLabel: Record<RoomType, string> = { vip: 'VIP xona', umumiy: 'Umumiy zal' };
-const pcStatusLabel: Record<PcStatus, string> = { bosh: 'Bo‘sh', band: 'Band', texnik_xizmat: 'Texnik xizmat' };
+const pcStatusLabel: Record<PcStatus, string> = { bosh: 'Bosh', band: 'Band', texnik_xizmat: 'Texnik xizmat' };
 
 function ClubInfoForm({ club, onSaved }: { club: Club; onSaved: (c: Club) => void }) {
   const [name, setName] = useState(club.name);
@@ -83,6 +83,10 @@ function RoomsManager({ clubId }: { clubId: string }) {
   const [type, setType] = useState<RoomType>('umumiy');
   const [price, setPrice] = useState('20000');
   const [error, setError] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editType, setEditType] = useState<RoomType>('umumiy');
+  const [editPrice, setEditPrice] = useState('');
 
   function load() {
     api.get<Room[]>(`/rooms?club=${clubId}`).then(setRooms).catch(() => setRooms([]));
@@ -97,7 +101,26 @@ function RoomsManager({ clubId }: { clubId: string }) {
       setName('');
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Xona qo‘shilmadi');
+      setError(err instanceof ApiError ? err.message : 'Xona qo\'shilmadi');
+    }
+  }
+
+  function startEdit(room: Room) {
+    setEditingId(room._id);
+    setEditName(room.name);
+    setEditType(room.type);
+    setEditPrice(String(room.pricePerHour));
+    setError('');
+  }
+
+  async function saveEdit(id: string) {
+    setError('');
+    try {
+      await api.patch(`/rooms/${id}`, { name: editName, type: editType, pricePerHour: Number(editPrice) });
+      setEditingId(null);
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Tahrirlashda xatolik');
     }
   }
 
@@ -106,7 +129,7 @@ function RoomsManager({ clubId }: { clubId: string }) {
       await api.delete(`/rooms/${id}`);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'O‘chirib bo‘lmadi');
+      setError(err instanceof ApiError ? err.message : 'O\'chirib bo\'lmadi');
     }
   }
 
@@ -137,14 +160,42 @@ function RoomsManager({ clubId }: { clubId: string }) {
       ) : (
         <ul className="space-y-2">
           {rooms.map((r) => (
-            <li key={r._id} className="flex items-center justify-between rounded-lg border border-border px-3 py-2 text-sm">
-              <span>
-                <strong>{r.name}</strong> · <Badge tone={r.type === 'vip' ? 'warning' : 'default'}>{roomTypeLabel[r.type]}</Badge>{' '}
-                · {r.pricePerHour.toLocaleString()} so&apos;m/soat
-              </span>
-              <Button variant="danger" onClick={() => removeRoom(r._id)}>
-                O&apos;chirish
-              </Button>
+            <li key={r._id} className="rounded-lg border border-border px-3 py-2 text-sm">
+              {editingId === r._id ? (
+                <div className="flex flex-wrap items-end gap-2">
+                  <Input required placeholder="Nomi" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-40" />
+                  <Select value={editType} onChange={(e) => setEditType(e.target.value as RoomType)} className="w-36">
+                    <option value="umumiy">Umumiy zal</option>
+                    <option value="vip">VIP xona</option>
+                  </Select>
+                  <Input
+                    required
+                    type="number"
+                    min={0}
+                    placeholder="so'm/soat"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(e.target.value)}
+                    className="w-32"
+                  />
+                  <Button onClick={() => saveEdit(r._id)}>Saqlash</Button>
+                  <Button variant="secondary" onClick={() => setEditingId(null)}>Bekor</Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span>
+                    <strong>{r.name}</strong> · <Badge tone={r.type === 'vip' ? 'warning' : 'default'}>{roomTypeLabel[r.type]}</Badge>{' '}
+                    · {r.pricePerHour.toLocaleString()} so&apos;m/soat
+                  </span>
+                  <div className="flex gap-2">
+                    <Button variant="secondary" onClick={() => startEdit(r)}>
+                      Tahrirlash
+                    </Button>
+                    <Button variant="danger" onClick={() => removeRoom(r._id)}>
+                      O&apos;chirish
+                    </Button>
+                  </div>
+                </div>
+              )}
             </li>
           ))}
         </ul>
@@ -181,7 +232,7 @@ function PcsManager({ clubId }: { clubId: string }) {
       setLabel('');
       loadPcs(roomId);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'PC qo‘shilmadi');
+      setError(err instanceof ApiError ? err.message : 'PC qo\'shilmadi');
     }
   }
 
@@ -199,7 +250,7 @@ function PcsManager({ clubId }: { clubId: string }) {
       await api.delete(`/pcs/${id}`);
       loadPcs(roomId);
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'O‘chirib bo‘lmadi');
+      setError(err instanceof ApiError ? err.message : 'O\'chirib bo\'lmadi');
     }
   }
 
@@ -278,7 +329,7 @@ function SnacksManager({ clubId }: { clubId: string }) {
       setName('');
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'Qo‘shilmadi');
+      setError(err instanceof ApiError ? err.message : 'Qo\'shilmadi');
     }
   }
 
@@ -296,7 +347,7 @@ function SnacksManager({ clubId }: { clubId: string }) {
       await api.delete(`/snacks/${id}`);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'O‘chirib bo‘lmadi');
+      setError(err instanceof ApiError ? err.message : 'O\'chirib bo\'lmadi');
     }
   }
 

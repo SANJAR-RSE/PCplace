@@ -19,23 +19,23 @@ export class RoomsController {
   }
 
   @UseGuards(RolesGuard)
-  @Roles(Role.CLUB_OWNER)
+  @Roles(Role.CLUB_OWNER, Role.ADMIN)
   @Post()
   create(@CurrentUser() user: CurrentUserPayload, @Body() dto: CreateRoomDto) {
-    return this.roomsService.create(user.sub, dto);
+    return this.roomsService.create(user.sub, user.role, dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles(Role.CLUB_OWNER)
+  @Roles(Role.CLUB_OWNER, Role.ADMIN)
   @Patch(':id')
   update(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string, @Body() dto: UpdateRoomDto) {
-    return this.roomsService.update(user.sub, id, dto);
+    return this.roomsService.update(user.sub, user.role, id, dto);
   }
 
   @UseGuards(RolesGuard)
-  @Roles(Role.CLUB_OWNER)
+  @Roles(Role.CLUB_OWNER, Role.ADMIN)
   @Delete(':id')
   remove(@CurrentUser() user: CurrentUserPayload, @Param('id') id: string) {
-    return this.roomsService.remove(user.sub, id);
+    return this.roomsService.remove(user.sub, user.role, id);
   }
 }

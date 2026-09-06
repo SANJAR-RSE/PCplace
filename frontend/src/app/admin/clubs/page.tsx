@@ -5,7 +5,9 @@ import { RequireRole } from '@/components/require-role';
 import { api, ApiError } from '@/lib/api';
 import { Badge, Button, Card, EmptyState, ErrorText, Field, Input, PageHeader, Select, Spinner } from '@/components/ui';
 import { RatingBadge } from '@/components/star-rating';
-import type { Club, ClubOwner, ClubStatus } from '@/types';
+import type { Club, ClubOwner, ClubStatus, Room, RoomType } from '@/types';
+
+const roomTypeLabel: Record<RoomType, string> = { vip: 'VIP xona', umumiy: 'Umumiy zal' };
 
 const statusTone: Record<ClubStatus, 'default' | 'success' | 'warning' | 'danger'> = {
   pending: 'warning',
@@ -160,12 +162,140 @@ function EditClubForm({ club, onSaved, onCancel }: { club: Club; onSaved: (c: Cl
   );
 }
 
+function AdminRoomsManager({ clubId }: { clubId: string }) {
+  const [rooms, setRooms] = useState<Room[] | null>(null);
+  const [name, setName] = useState('');
+  const [type, setType] = useState<RoomType>('umumiy');
+  const [price, setPrice] = useState('20000');
+  const [error, setError] = useState('');
+  const [editingId, setEditingId] = useState<string | null>(null);
+  const [editName, setEditName] = useState('');
+  const [editType, setEditType] = useState<RoomType>('umumiy');
+  const [editPrice, setEditPrice] = useState('');
+
+  function load() {
+    api.get<Room[]>(`/rooms?club=${clubId}`).then(setRooms).catch(() => setRooms([]));
+  }
+  useEffect(load, [clubId]);
+
+  async function addRoom(e: FormEvent) {
+    e.preventDefault();
+    setError('');
+    try {
+      await api.post('/rooms', { club: clubId, name, type, pricePerHour: Number(price) });
+      setName('');
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Xona qo&apos;shilmadi');
+    }
+  }
+
+  function startEdit(room: Room) {
+    setEditingId(room._id);
+    setEditName(room.name);
+    setEditType(room.type);
+    setEditPrice(String(room.pricePerHour));
+    setError('');
+  }
+
+  async function saveEdit(id: string) {
+    setError('');
+    try {
+      await api.patch(`/rooms/${id}`, { name: editName, type: editType, pricePerHour: Number(editPrice) });
+      setEditingId(null);
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'Tahrirlashda xatolik');
+    }
+  }
+
+  async function removeRoom(id: string) {
+    try {
+      await api.delete(`/rooms/${id}`);
+      load();
+    } catch (err) {
+      setError(err instanceof ApiError ? err.message : 'O&apos;chirib bo&apos;lmadi');
+    }
+  }
+
+  return (
+    <div className="mt-3 rounded-lg bg-border/30 p-3">
+      <h3 className="mb-2 text-sm font-semibold">Xonalar</h3>
+      <ErrorText>{error}</ErrorText>
+      <form onSubmit={addRoom} className="mb-3 flex flex-wrap items-end gap-2">
+        <div className="w-40">
+          <Input required placeholder="Xona nomi" value={name} onChange={(e) => setName(e.target.value)} />
+        </div>
+        <div className="w-32">
+          <Select value={type} onChange={(e) => setType(e.target.value as RoomType)}>
+            <option value="umumiy">Umumiy zal</option>
+            <option value="vip">VIP xona</option>
+          </Select>
+        </div>
+        <div className="w-28">
+          <Input required type="number" min={0} placeholder="so&apos;m/soat" value={price} onChange={(e) => setPrice(e.target.value)} />
+        </div>
+        <Button type="submit">Qo&apos;shish</Button>
+      </form>
+
+      {rooms === null ? (
+        <Spinner />
+      ) : rooms.length === 0 ? (
+        <EmptyState title="Xonalar qo&apos;shilmagan" />
+      ) : (
+        <ul className="space-y-2">
+          {rooms.map((r) => (
+            <li key={r._id} className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
+              {editingId === r._id ? (
+                <div className="flex flex-wrap items-end gap-2">
+                  <Input required placeholder="Nomi" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-40" />
+                  <Select value={editType} onChange={(e) => setEditType(e.target.value as RoomType)} className="w-32">
+                    <option value="umumiy">Umumiy zal</option>
+                    <option value="vip">VIP xona</option>
+                  </Select>
+                  <Input
+                    required
+                    type="number"
+                    min={0}
+                    placeholder="so&apos;m/soat"
+                    value={editPrice}
+                    onChange={(e) => setEditPrice(e.target.value)}
+                    className="w-28"
+                  />
+                  <Button onClick={() => saveEdit(r._id)}>Saqlash</Button>
+                  <Button variant="secondary" onClick={() => setEditingId(null)}>Bekor</Button>
+                </div>
+              ) : (
+                <div className="flex items-center justify-between">
+                  <span>
+                    <strong>{r.name}</strong> · <Badge tone={r.type === 'vip' ? 'warning' : 'default'}>{roomTypeLabel[r.type]}</Badge>{' '}
+                    · {r.pricePerHour.toLocaleString()} so&apos;m/soat
+                  </span>
+                  <div className="flex gap-2">
+                    <Button variant="secondary" onClick={() => startEdit(r)}>
+                      Tahrirlash
+                    </Button>
+                    <Button variant="danger" onClick={() => removeRoom(r._id)}>
+                      O&apos;chirish
+                    </Button>
+                  </div>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function AdminClubsContent() {
   const [clubs, setClubs] = useState<Club[] | null>(null);
   const [owners, setOwners] = useState<ClubOwner[]>([]);
   const [error, setError] = useState('');
   const [showCreate, setShowCreate] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
+  const [roomsOpenId, setRoomsOpenId] = useState<string | null>(null);
 
   function load() {
     api.get<Club[]>('/clubs/all').then(setClubs).catch(() => setClubs([]));
@@ -238,6 +368,9 @@ function AdminClubsContent() {
                   <Button variant="secondary" onClick={() => setEditingId(editingId === club._id ? null : club._id)}>
                     {editingId === club._id ? 'Yopish' : 'Tahrirlash'}
                   </Button>
+                  <Button variant="secondary" onClick={() => setRoomsOpenId(roomsOpenId === club._id ? null : club._id)}>
+                    {roomsOpenId === club._id ? 'Xonalarni yopish' : 'Xonalar'}
+                  </Button>
                 </div>
               </div>
 
@@ -251,6 +384,8 @@ function AdminClubsContent() {
                   }}
                 />
               )}
+
+              {roomsOpenId === club._id && <AdminRoomsManager clubId={club._id} />}
             </Card>
           ))}
         </div>

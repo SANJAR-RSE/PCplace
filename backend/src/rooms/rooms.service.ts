@@ -3,6 +3,7 @@ import { InjectModel } from '@nestjs/mongoose';
 import { Model } from 'mongoose';
 import { Club, ClubDocument } from '../schemas/club.schema';
 import { Room, RoomDocument } from '../schemas/room.schema';
+import { Role } from '../common/enums/role.enum';
 import { CreateRoomDto } from './dto/create-room.dto';
 import { UpdateRoomDto } from './dto/update-room.dto';
 
@@ -31,21 +32,27 @@ export class RoomsService {
     }
   }
 
-  async create(ownerId: string, dto: CreateRoomDto) {
-    await this.assertOwnsClub(ownerId, dto.club);
+  async create(ownerId: string, role: string, dto: CreateRoomDto) {
+    if (role !== Role.ADMIN) {
+      await this.assertOwnsClub(ownerId, dto.club);
+    }
     return this.roomModel.create(dto);
   }
 
-  async update(ownerId: string, roomId: string, dto: UpdateRoomDto) {
+  async update(ownerId: string, role: string, roomId: string, dto: UpdateRoomDto) {
     const room = await this.findById(roomId);
-    await this.assertOwnsClub(ownerId, room.club.toString());
+    if (role !== Role.ADMIN) {
+      await this.assertOwnsClub(ownerId, room.club.toString());
+    }
     Object.assign(room, dto);
     return room.save();
   }
 
-  async remove(ownerId: string, roomId: string) {
+  async remove(ownerId: string, role: string, roomId: string) {
     const room = await this.findById(roomId);
-    await this.assertOwnsClub(ownerId, room.club.toString());
+    if (role !== Role.ADMIN) {
+      await this.assertOwnsClub(ownerId, room.club.toString());
+    }
     await room.deleteOne();
     return { deleted: true };
   }
