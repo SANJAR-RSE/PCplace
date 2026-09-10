@@ -2,14 +2,26 @@
 @import "leaflet/dist/leaflet.css";
 
 :root {
-  --background: #f6f7fb;
-  --foreground: #14141f;
+  --background: #f4f7fb;
+  --foreground: #152033;
   --surface: #ffffff;
-  --border: #e4e6ef;
-  --primary: #6c4bff;
-  --primary-dark: #5636e0;
-  --accent: #17c3a2;
-  --muted: #6b7280;
+  --border: #e4eaf2;
+  --primary: #5b4bff;
+  --primary-dark: #4034d8;
+  --accent: #12b99c;
+  --muted: #738096;
+}
+
+html.dark {
+  --background: #0d1320;
+  --foreground: #e7edf8;
+  --surface: #151e2d;
+  --border: #28364b;
+  --primary: #8275ff;
+  --primary-dark: #9a90ff;
+  --accent: #2bd3b4;
+  --muted: #96a4ba;
+  color-scheme: dark;
 }
 
 @theme inline {
@@ -25,24 +37,38 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0b0b12;
-    --foreground: #f2f2f7;
-    --surface: #15151f;
-    --border: #262635;
-    --muted: #9aa0ac;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
+  background-image:
+    radial-gradient(circle at 88% -8%, rgba(91, 75, 255, 0.12), transparent 27rem),
+    radial-gradient(circle at 0% 42%, rgba(18, 185, 156, 0.07), transparent 25rem);
 }
+
+* { border-color: var(--border); }
+
+::selection { background: rgba(91, 75, 255, 0.18); }
+
+html.dark body {
+  background-image:
+    radial-gradient(circle at 88% -8%, rgba(130, 117, 255, .18), transparent 27rem),
+    radial-gradient(circle at 0% 42%, rgba(43, 211, 180, .08), transparent 25rem);
+}
+
+html.dark .bg-white,
+html.dark .bg-slate-50 { background-color: var(--surface) !important; }
+html.dark .bg-slate-50\/70 { background-color: rgba(21, 30, 45, .7) !important; }
+html.dark .bg-white\/80,
+html.dark .bg-white\/85,
+html.dark .bg-white\/90 { background-color: rgba(21, 30, 45, .88) !important; }
 
 .leaflet-container {
   width: 100%;
   height: 100%;
   border-radius: 1rem;
+}
+
+@media (max-width: 767px) {
+  body { background-image: radial-gradient(circle at 100% 0%, rgba(91, 75, 255, .10), transparent 20rem); }
 }

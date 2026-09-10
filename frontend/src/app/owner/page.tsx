@@ -120,9 +120,9 @@ function OwnerContent() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {clubs.map((club) => (
-            <Link key={club._id} href={`/owner/clubs/${club._id}`} className="block rounded-xl border border-border p-4 transition hover:border-primary/50">
+            <Link key={club._id} href={`/owner/clubs/${club._id}`} className="block rounded-[1.1rem] border border-border bg-white p-5 shadow-[0_10px_24px_-22px_rgba(29,42,75,.5)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
               <div className="mb-1 flex items-center justify-between">
-                <span className="font-semibold">{club.name}</span>
+                <span className="font-bold">{club.name}</span>
                 <Badge tone={statusTone[club.status]}>{statusLabel[club.status]}</Badge>
               </div>
               <p className="text-sm text-muted">{club.address}</p>

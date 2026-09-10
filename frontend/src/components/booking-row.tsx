@@ -26,10 +26,10 @@ export function BookingRow({ booking, refs, actions }: { booking: Booking; refs:
   const pc = refs.pcs[idOf(booking.pc)];
 
   return (
-    <div className="rounded-xl border border-border p-4">
+    <div className="rounded-[1.1rem] border border-border bg-white p-4 shadow-[0_10px_24px_-22px_rgba(29,42,75,.5)]">
       <div className="mb-2 flex flex-wrap items-center justify-between gap-2">
         <div>
-          <p className="font-semibold">{club?.name ?? 'Klub'}</p>
+          <p className="font-bold">{club?.name ?? 'Klub'}</p>
           <p className="text-sm text-muted">
             {room?.name ?? 'Xona'} · {pc?.label ?? 'PC'} · {booking.hours} soat
           </p>

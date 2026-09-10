@@ -36,7 +36,7 @@ export function ClubsMap({ clubs, height = 420 }: { clubs: Club[]; height?: numb
   const initialCenter: [number, number] = clubs[0] ? [clubs[0].location.lat, clubs[0].location.lng] : TASHKENT;
 
   return (
-    <div style={{ height }} className="overflow-hidden rounded-2xl border border-border">
+    <div style={{ height }} className="overflow-hidden rounded-[1.25rem] border border-border bg-white shadow-[0_16px_30px_-24px_rgba(29,42,75,.55)]">
       <MapContainer center={initialCenter} zoom={12} scrollWheelZoom>
         <TileLayer
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
