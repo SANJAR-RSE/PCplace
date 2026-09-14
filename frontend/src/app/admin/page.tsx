@@ -7,11 +7,11 @@ import { api } from '@/lib/api';
 import { Card, PageHeader, Spinner } from '@/components/ui';
 import type { AdminStats } from '@/types';
 
-const tiles: { key: keyof AdminStats; label: string; icon: React.ComponentType<{ size?: number; className?: string }> }[] = [
-  { key: 'usersCount', label: 'Foydalanuvchilar', icon: UserIcon },
-  { key: 'ownersCount', label: 'Klub egalari', icon: Building2 },
-  { key: 'clubsCount', label: 'Klublar', icon: Gamepad2 },
-  { key: 'bookingsCount', label: 'Bronlar', icon: CalendarCheck2 },
+const tiles: { key: keyof AdminStats; label: string; icon: React.ComponentType<{ size?: number }>; color: string }[] = [
+  { key: 'usersCount', label: 'Foydalanuvchilar', icon: UserIcon, color: 'bg-[var(--primary)]/10 text-[var(--primary)]' },
+  { key: 'ownersCount', label: 'Klub egalari', icon: Building2, color: 'bg-amber-500/10 text-amber-400' },
+  { key: 'clubsCount', label: 'Klublar', icon: Gamepad2, color: 'bg-[var(--accent)]/10 text-[var(--accent)]' },
+  { key: 'bookingsCount', label: 'Bronlar', icon: CalendarCheck2, color: 'bg-[var(--neon-blue)]/10 text-[var(--neon-blue)]' },
 ];
 
 function AdminStatsContent() {
@@ -30,11 +30,11 @@ function AdminStatsContent() {
         <div className="grid gap-4 sm:grid-cols-2 md:grid-cols-4">
           {tiles.map((t) => (
             <Card key={t.key}>
-              <div className="grid h-10 w-10 place-items-center rounded-lg bg-primary/10 text-primary">
+              <div className={`grid h-10 w-10 place-items-center rounded-lg ${t.color}`}>
                 <t.icon size={20} />
               </div>
-              <p className="mt-2 text-3xl font-extrabold">{stats[t.key]}</p>
-              <p className="text-sm text-muted">{t.label}</p>
+              <p className="mt-2 text-3xl font-extrabold text-[var(--foreground)]">{stats[t.key]}</p>
+              <p className="text-sm text-[var(--muted)]">{t.label}</p>
             </Card>
           ))}
         </div>

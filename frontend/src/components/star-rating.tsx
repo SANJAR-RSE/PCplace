@@ -6,7 +6,7 @@ export function RatingBadge({ value, count, size = 16 }: { value: number; count?
     <span className="inline-flex items-center gap-1">
       <Star size={size} className="fill-amber-400 text-amber-400" />
       <span>{value.toFixed(1)}</span>
-      {typeof count === 'number' && <span className="text-muted">({count})</span>}
+      {typeof count === 'number' && <span className="text-[var(--muted)]">({count})</span>}
     </span>
   );
 }
@@ -16,7 +16,7 @@ export function StarRow({ value, max = 5, size = 16 }: { value: number; max?: nu
   return (
     <span className="inline-flex items-center gap-0.5">
       {Array.from({ length: max }, (_, i) => (
-        <Star key={i} size={size} className={i < value ? 'fill-amber-400 text-amber-400' : 'text-border'} />
+        <Star key={i} size={size} className={i < value ? 'fill-amber-400 text-amber-400' : 'text-[var(--border)]'} />
       ))}
     </span>
   );
@@ -29,8 +29,8 @@ export function StarPicker({ value, onChange, size = 22 }: { value: number; onCh
       {Array.from({ length: 5 }, (_, i) => {
         const n = i + 1;
         return (
-          <button key={n} type="button" onClick={() => onChange(n)} className="p-0.5">
-            <Star size={size} className={n <= value ? 'fill-amber-400 text-amber-400' : 'text-border'} />
+          <button key={n} type="button" onClick={() => onChange(n)} className="p-0.5 transition-transform hover:scale-110">
+            <Star size={size} className={n <= value ? 'fill-amber-400 text-amber-400' : 'text-[var(--border)]'} />
           </button>
         );
       })}

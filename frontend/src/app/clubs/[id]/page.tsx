@@ -12,9 +12,9 @@ import type { Booking, Club, Pc, Review, Room, Snack } from '@/types';
 
 const roomTypeLabel: Record<string, string> = { vip: 'VIP xona', umumiy: 'Umumiy zal' };
 const pcStatusStyle: Record<string, string> = {
-  bosh: 'border-emerald-400 bg-emerald-500/10 text-emerald-700',
-  band: 'border-red-300 bg-red-500/10 text-red-500 cursor-not-allowed opacity-70',
-  texnik_xizmat: 'border-border bg-border/40 text-muted cursor-not-allowed opacity-70',
+  bosh: 'border-[var(--accent)] bg-[var(--accent)]/10 text-[var(--accent)]',
+  band: 'border-[var(--danger)]/50 bg-[var(--danger)]/10 text-[var(--danger)] cursor-not-allowed opacity-70',
+  texnik_xizmat: 'border-[var(--border)] bg-[var(--surface2)] text-[var(--muted)] cursor-not-allowed opacity-70',
 };
 
 export default function ClubDetailPage({ params }: { params: Promise<{ id: string }> }) {
@@ -52,7 +52,7 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
         setReviews(rv);
         setSnacks(sn.filter((s) => s.isAvailable));
       })
-      .catch(() => setLoadError('Klub ma’lumotlarini yuklab bo‘lmadi'));
+      .catch(() => setLoadError("Klub ma'lumotlarini yuklab bo'lmadi"));
   }, [id]);
 
   function selectRoom(room: Room) {
@@ -143,7 +143,7 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
 
       {/* 1. Xonalar */}
       <Card className="mb-6">
-        <h2 className="mb-3 font-semibold">1. Xonani tanlang</h2>
+        <h2 className="mb-3 font-semibold text-[var(--foreground)]">1. Xonani tanlang</h2>
         {rooms.length === 0 ? (
           <EmptyState title="Bu klubda hali xonalar qo'shilmagan" />
         ) : (
@@ -152,15 +152,17 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
               <button
                 key={room._id}
                 onClick={() => selectRoom(room)}
-                className={`rounded-xl border p-4 text-left transition ${
-                  selectedRoom?._id === room._id ? 'border-primary ring-2 ring-primary/30' : 'border-border hover:border-primary/50'
+                className={`rounded-xl border p-4 text-left transition-all duration-200 ${
+                  selectedRoom?._id === room._id
+                    ? 'border-[var(--primary)] ring-2 ring-[var(--primary)]/30 bg-[var(--primary)]/5'
+                    : 'border-[var(--border)] hover:border-[var(--primary)]/40'
                 }`}
               >
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="font-medium">{room.name}</span>
+                  <span className="font-medium text-[var(--foreground)]">{room.name}</span>
                   <Badge tone={room.type === 'vip' ? 'warning' : 'default'}>{roomTypeLabel[room.type]}</Badge>
                 </div>
-                <p className="text-sm text-muted">{room.pricePerHour.toLocaleString()} so&apos;m / soat</p>
+                <p className="text-sm text-[var(--muted)]">{room.pricePerHour.toLocaleString()} so&apos;m / soat</p>
               </button>
             ))}
           </div>
@@ -170,7 +172,7 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
       {/* 2. PC tanlash */}
       {selectedRoom && (
         <Card className="mb-6">
-          <h2 className="mb-3 font-semibold">2. Bo&apos;sh kompyuter tanlang — {selectedRoom.name}</h2>
+          <h2 className="mb-3 font-semibold text-[var(--foreground)]">2. Bo&apos;sh kompyuter tanlang — {selectedRoom.name}</h2>
           {pcs === null ? (
             <Spinner />
           ) : pcs.length === 0 ? (
@@ -182,8 +184,8 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
                   key={pc._id}
                   disabled={pc.status !== 'bosh'}
                   onClick={() => setSelectedPc(pc)}
-                  className={`rounded-lg border-2 px-2 py-3 text-sm font-medium transition ${pcStatusStyle[pc.status]} ${
-                    selectedPc?._id === pc._id ? 'ring-2 ring-primary' : ''
+                  className={`rounded-lg border-2 px-2 py-3 text-sm font-medium transition-all duration-200 ${pcStatusStyle[pc.status]} ${
+                    selectedPc?._id === pc._id ? 'ring-2 ring-[var(--primary)]' : ''
                   }`}
                 >
                   {pc.label}
@@ -191,15 +193,15 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
               ))}
             </div>
           )}
-          <div className="mt-3 flex gap-4 text-xs text-muted">
+          <div className="mt-3 flex gap-4 text-xs text-[var(--muted)]">
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-emerald-500" /> bo&apos;sh
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--accent)]" /> bo&apos;sh
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-red-500" /> band
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--danger)]" /> band
             </span>
             <span className="inline-flex items-center gap-1.5">
-              <span className="h-2.5 w-2.5 rounded-full bg-border" /> texnik xizmatda
+              <span className="h-2.5 w-2.5 rounded-full bg-[var(--border)]" /> texnik xizmatda
             </span>
           </div>
         </Card>
@@ -208,7 +210,7 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
       {/* 3. Vaqt + snacklar + narx */}
       {selectedPc && selectedRoom && (
         <Card className="mb-6">
-          <h2 className="mb-3 font-semibold">3. Vaqt va qo&apos;shimchalar — {selectedPc.label}</h2>
+          <h2 className="mb-3 font-semibold text-[var(--foreground)]">3. Vaqt va qo&apos;shimchalar — {selectedPc.label}</h2>
 
           <Field label="Necha soat o'ynaysiz?">
             <Input
@@ -222,20 +224,20 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
 
           {availableSnacks.length > 0 && (
             <div className="mb-4">
-              <p className="mb-2 text-sm font-medium text-foreground/80">Snacks / qo&apos;shimcha xizmatlar</p>
+              <p className="mb-2 text-sm font-medium text-[var(--foreground)]/80">Snacks / qo&apos;shimcha xizmatlar</p>
               <div className="grid gap-2 sm:grid-cols-2">
                 {availableSnacks.map((snack) => {
                   const checked = snack._id in selectedSnacks;
                   return (
                     <label
                       key={snack._id}
-                      className={`flex items-center justify-between rounded-lg border px-3 py-2 text-sm ${
-                        checked ? 'border-primary bg-primary/5' : 'border-border'
+                      className={`flex items-center justify-between rounded-xl border px-3 py-2 text-sm transition-all ${
+                        checked ? 'border-[var(--primary)] bg-[var(--primary)]/5' : 'border-[var(--border)]'
                       }`}
                     >
-                      <span className="flex items-center gap-2">
+                      <span className="flex items-center gap-2 text-[var(--foreground)]">
                         <input type="checkbox" checked={checked} onChange={(e) => toggleSnack(snack._id, e.target.checked)} />
-                        {snack.name} <span className="text-muted">({snack.price.toLocaleString()} so&apos;m)</span>
+                        {snack.name} <span className="text-[var(--muted)]">({snack.price.toLocaleString()} so&apos;m)</span>
                       </span>
                       {checked && (
                         <Input
@@ -253,16 +255,16 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
             </div>
           )}
 
-          <div className="rounded-lg bg-border/30 p-4 text-sm">
-            <div className="flex justify-between">
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4 text-sm">
+            <div className="flex justify-between text-[var(--foreground)]/80">
               <span>Xona narxi ({hours} soat)</span>
               <span>{roomCost.toLocaleString()} so&apos;m</span>
             </div>
-            <div className="flex justify-between">
+            <div className="flex justify-between text-[var(--foreground)]/80">
               <span>Snacklar</span>
               <span>{snacksCost.toLocaleString()} so&apos;m</span>
             </div>
-            <div className="mt-2 flex justify-between border-t border-border pt-2 text-base font-bold">
+            <div className="mt-2 flex justify-between border-t border-[var(--border)] pt-2 text-base font-bold text-[var(--foreground)]">
               <span>Jami</span>
               <span>{total.toLocaleString()} so&apos;m</span>
             </div>
@@ -271,8 +273,10 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
           <ErrorText>{bookingError}</ErrorText>
 
           {confirmedBooking ? (
-            <div className="mt-4 flex items-start gap-2 rounded-lg bg-emerald-500/10 p-4 text-sm text-emerald-700">
-              <CheckCircle2 size={18} className="mt-0.5 shrink-0" />
+            <div className="mt-4 flex items-start gap-2 rounded-xl bg-[var(--accent)]/10 p-4 text-sm text-[var(--accent)]">
+              <span className="mt-0.5 shrink-0">
+                <CheckCircle2 size={18} />
+              </span>
               <span>
                 Bron muvaffaqiyatli yaratildi! To&apos;lov joyida (naqd/karta) amalga oshiriladi.{' '}
                 <Link href="/profile" className="font-semibold underline">
@@ -290,17 +294,17 @@ export default function ClubDetailPage({ params }: { params: Promise<{ id: strin
 
       {/* Izohlar */}
       <Card>
-        <h2 className="mb-3 font-semibold">Izohlar</h2>
+        <h2 className="mb-3 font-semibold text-[var(--foreground)]">Izohlar</h2>
         {!reviews || reviews.length === 0 ? (
           <EmptyState title="Hali izohlar yo'q" hint="Bron qilib, safaringizdan so'ng birinchi bo'lib izoh qoldiring." />
         ) : (
           <ul className="space-y-3">
             {reviews.map((rv) => (
-              <li key={rv._id} className="rounded-lg border border-border p-3 text-sm">
+              <li key={rv._id} className="rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-3 text-sm">
                 <div className="mb-1">
                   <StarRow value={rv.rating} />
                 </div>
-                {rv.comment && <p className="text-foreground/80">{rv.comment}</p>}
+                {rv.comment && <p className="text-[var(--foreground)]/80">{rv.comment}</p>}
               </li>
             ))}
           </ul>

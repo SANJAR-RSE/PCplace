@@ -36,11 +36,11 @@ export function ClubsMap({ clubs, height = 420 }: { clubs: Club[]; height?: numb
   const initialCenter: [number, number] = clubs[0] ? [clubs[0].location.lat, clubs[0].location.lng] : TASHKENT;
 
   return (
-    <div style={{ height }} className="overflow-hidden rounded-[1.25rem] border border-border bg-white shadow-[0_16px_30px_-24px_rgba(29,42,75,.55)]">
+    <div style={{ height }} className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_8px_24px_rgba(0,0,0,0.3)]">
       <MapContainer center={initialCenter} zoom={12} scrollWheelZoom>
         <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
+          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
         />
         <FitBounds clubs={clubs} />
         {clubs.map((club) => (
@@ -48,11 +48,11 @@ export function ClubsMap({ clubs, height = 420 }: { clubs: Club[]; height?: numb
             <Popup>
               <div className="min-w-[160px]">
                 <p className="font-semibold">{club.name}</p>
-                <p className="text-xs text-gray-500">{club.address}</p>
+                <p className="text-xs text-[var(--muted)]">{club.address}</p>
                 <p className="mt-1 text-xs">
                   <RatingBadge value={club.ratingAverage} count={club.ratingCount} size={12} />
                 </p>
-                <Link href={`/clubs/${club._id}`} className="mt-2 inline-block text-xs font-semibold text-indigo-600">
+                <Link href={`/clubs/${club._id}`} className="mt-2 inline-block text-xs font-semibold text-[var(--primary)]">
                   Ko&apos;rish →
                 </Link>
               </div>

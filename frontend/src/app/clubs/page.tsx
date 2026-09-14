@@ -2,15 +2,16 @@
 
 import dynamic from 'next/dynamic';
 import { useEffect, useMemo, useState } from 'react';
+import { Search } from 'lucide-react';
 import { api } from '@/lib/api';
 import { ClubCard } from '@/components/club-card';
-import { EmptyState, Input, PageHeader, Spinner } from '@/components/ui';
+import { EmptyState, PageHeader, Spinner } from '@/components/ui';
 import type { Club } from '@/types';
 
 const ClubsMap = dynamic(() => import('@/components/clubs-map').then((m) => m.ClubsMap), {
   ssr: false,
   loading: () => (
-    <div className="grid h-[420px] place-items-center rounded-2xl border border-border">
+    <div className="grid h-[420px] place-items-center rounded-2xl border border-[var(--border)] bg-[var(--surface)]">
       <Spinner />
     </div>
   ),
@@ -25,7 +26,7 @@ export default function ClubsPage() {
     api
       .get<Club[]>('/clubs')
       .then(setClubs)
-      .catch(() => setError('Klublar ro‘yxatini yuklab bo‘lmadi'));
+      .catch(() => setError("Klublar ro'yxatini yuklab bo'lmadi"));
   }, []);
 
   const filtered = useMemo(() => {
@@ -39,14 +40,27 @@ export default function ClubsPage() {
     <div className="mx-auto max-w-6xl px-4 py-8">
       <PageHeader
         title="Kompyuterhonalar xaritasi"
-        subtitle="Yaqiningizdagi hamkor klublarni toping, bo‘sh joy va narxlarni solishtiring."
+        subtitle="Yaqiningizdagi hamkor klublarni toping, bo'sh joy va narxlarni solishtiring."
       />
 
+      {/* Search bar */}
       <div className="mb-6 max-w-sm">
-        <Input placeholder="Nomi yoki manzil bo'yicha qidirish…" value={search} onChange={(e) => setSearch(e.target.value)} />
+        <div className="relative">
+          <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-[var(--muted)]" />
+          <input
+            className="w-full rounded-xl border border-[var(--border)] bg-[var(--surface2)] py-2.5 pl-10 pr-4 text-sm text-[var(--foreground)] outline-none transition-all duration-200 placeholder:text-[var(--muted)]/50 hover:border-[var(--primary)]/40 focus:border-[var(--primary)] focus:ring-3 focus:ring-[var(--primary)]/20"
+            placeholder="Nomi yoki manzil bo'yicha qidirish…"
+            value={search}
+            onChange={(e) => setSearch(e.target.value)}
+          />
+        </div>
       </div>
 
-      {error && <p className="mb-4 text-sm text-red-600">{error}</p>}
+      {error && (
+        <p className="mb-4 rounded-xl border border-[var(--danger)]/20 bg-[var(--danger)]/10 px-4 py-2.5 text-sm text-[var(--danger)]">
+          {error}
+        </p>
+      )}
 
       {!clubs ? (
         <div className="flex justify-center py-16">

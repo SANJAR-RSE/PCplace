@@ -49,8 +49,8 @@ function CreateClubForm({ onCreated }: { onCreated: () => void }) {
 
   return (
     <Card>
-      <h2 className="mb-3 font-semibold">Yangi klub qo&apos;shish</h2>
-      <p className="mb-3 text-sm text-muted">Klub admin tomonidan tasdiqlangach xaritada ko&apos;rinadi.</p>
+      <h2 className="mb-3 font-semibold text-[var(--foreground)]">Yangi klub qo&apos;shish</h2>
+      <p className="mb-3 text-sm text-[var(--muted)]">Klub admin tomonidan tasdiqlangach xaritada ko&apos;rinadi.</p>
       <form onSubmit={submit}>
         <ErrorText>{error}</ErrorText>
         <Field label="Nomi">
@@ -120,13 +120,13 @@ function OwnerContent() {
       ) : (
         <div className="grid gap-4 sm:grid-cols-2">
           {clubs.map((club) => (
-            <Link key={club._id} href={`/owner/clubs/${club._id}`} className="block rounded-[1.1rem] border border-border bg-white p-5 shadow-[0_10px_24px_-22px_rgba(29,42,75,.5)] transition hover:-translate-y-0.5 hover:border-primary/40 hover:shadow-md">
+            <Link key={club._id} href={`/owner/clubs/${club._id}`} className="block rounded-2xl border border-[var(--border)] bg-[var(--surface)] p-5 shadow-[0_8px_24px_rgba(0,0,0,0.3)] transition-all duration-300 hover:-translate-y-1 hover:border-[var(--primary)]/40 hover:shadow-[0_0_20px_var(--primary-glow)]">
               <div className="mb-1 flex items-center justify-between">
-                <span className="font-bold">{club.name}</span>
+                <span className="font-bold text-[var(--foreground)]">{club.name}</span>
                 <Badge tone={statusTone[club.status]}>{statusLabel[club.status]}</Badge>
               </div>
-              <p className="text-sm text-muted">{club.address}</p>
-              <p className="mt-2 text-sm">
+              <p className="text-sm text-[var(--muted)]">{club.address}</p>
+              <p className="mt-2 text-sm text-[var(--muted)]">
                 <RatingBadge value={club.ratingAverage} count={club.ratingCount} />
               </p>
             </Link>

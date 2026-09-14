@@ -70,7 +70,7 @@ export function AdminEntityManager({
       await api.delete(`/${resource}/${id}`);
       load();
     } catch (err) {
-      setError(err instanceof ApiError ? err.message : 'O‘chirib bo‘lmadi');
+      setError(err instanceof ApiError ? err.message : "O'chirib bo'lmadi");
     }
   }
 
@@ -119,10 +119,10 @@ export function AdminEntityManager({
       ) : (
         <div className="space-y-2">
           {items.map((item) => (
-            <div key={item._id} className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-border px-4 py-3">
+            <div key={item._id} className="flex flex-wrap items-center justify-between gap-2 rounded-xl border border-[var(--border)] bg-[var(--surface)] px-4 py-3">
               <div>
-                <p className="font-medium">{item.fullName}</p>
-                <p className="text-sm text-muted">
+                <p className="font-medium text-[var(--foreground)]">{item.fullName}</p>
+                <p className="text-sm text-[var(--muted)]">
                   {item.email} {item.phone && `· ${item.phone}`}
                 </p>
               </div>

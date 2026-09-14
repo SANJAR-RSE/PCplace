@@ -56,7 +56,7 @@ function CreateClubForm({ owners, onCreated, onCancel }: { owners: ClubOwner[]; 
 
   return (
     <Card className="mb-6">
-      <h2 className="mb-3 font-semibold">Yangi klub qo&apos;shish</h2>
+      <h2 className="mb-3 font-semibold text-[var(--foreground)]">Yangi klub qo&apos;shish</h2>
       {owners.length === 0 ? (
         <EmptyState title="Avval klub egasi yarating" hint="Klub ma'lum bir egaga bog'lanishi kerak — 'Klub egalari' bo'limidan qo'shing." />
       ) : (
@@ -131,7 +131,7 @@ function EditClubForm({ club, onSaved, onCancel }: { club: Club; onSaved: (c: Cl
   }
 
   return (
-    <form onSubmit={submit} className="mt-3 rounded-lg bg-border/30 p-3">
+    <form onSubmit={submit} className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4">
       <ErrorText>{error}</ErrorText>
       <Field label="Nomi">
         <Input required value={name} onChange={(e) => setName(e.target.value)} />
@@ -219,8 +219,8 @@ function AdminRoomsManager({ clubId }: { clubId: string }) {
   }
 
   return (
-    <div className="mt-3 rounded-lg bg-border/30 p-3">
-      <h3 className="mb-2 text-sm font-semibold">Xonalar</h3>
+    <div className="mt-3 rounded-xl border border-[var(--border)] bg-[var(--surface2)] p-4">
+      <h3 className="mb-2 text-sm font-semibold text-[var(--foreground)]">Xonalar</h3>
       <ErrorText>{error}</ErrorText>
       <form onSubmit={addRoom} className="mb-3 flex flex-wrap items-end gap-2">
         <div className="w-40">
@@ -245,7 +245,7 @@ function AdminRoomsManager({ clubId }: { clubId: string }) {
       ) : (
         <ul className="space-y-2">
           {rooms.map((r) => (
-            <li key={r._id} className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
+            <li key={r._id} className="rounded-xl border border-[var(--border)] bg-[var(--surface)] px-3 py-2 text-sm text-[var(--foreground)]">
               {editingId === r._id ? (
                 <div className="flex flex-wrap items-end gap-2">
                   <Input required placeholder="Nomi" value={editName} onChange={(e) => setEditName(e.target.value)} className="w-40" />
@@ -269,7 +269,7 @@ function AdminRoomsManager({ clubId }: { clubId: string }) {
                 <div className="flex items-center justify-between">
                   <span>
                     <strong>{r.name}</strong> · <Badge tone={r.type === 'vip' ? 'warning' : 'default'}>{roomTypeLabel[r.type]}</Badge>{' '}
-                    · {r.pricePerHour.toLocaleString()} so&apos;m/soat
+                    · <span className="text-[var(--muted)]">{r.pricePerHour.toLocaleString()} so&apos;m/soat</span>
                   </span>
                   <div className="flex gap-2">
                     <Button variant="secondary" onClick={() => startEdit(r)}>
@@ -349,9 +349,9 @@ function AdminClubsContent() {
             <Card key={club._id}>
               <div className="flex flex-wrap items-center justify-between gap-3">
                 <div>
-                  <p className="font-semibold">{club.name}</p>
-                  <p className="text-sm text-muted">{club.address}</p>
-                  <p className="mt-1 text-xs text-muted">
+                  <p className="font-semibold text-[var(--foreground)]">{club.name}</p>
+                  <p className="text-sm text-[var(--muted)]">{club.address}</p>
+                  <p className="mt-1 text-xs text-[var(--muted)]">
                     <RatingBadge value={club.ratingAverage} count={club.ratingCount} size={12} />
                   </p>
                 </div>
