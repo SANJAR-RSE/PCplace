@@ -31,8 +31,8 @@ export function ClubCard({ club }: { club: Club }) {
 
         {/* TOP badge */}
         {club.isPromoted && (
-          <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)] backdrop-blur-md">
-            <Zap size={10} className="fill-amber-400 text-amber-400" /> TOP
+          <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full border border-[var(--primary)]/40 bg-[var(--primary)]/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-[var(--primary)] shadow-[0_0_12px_var(--primary-glow)] backdrop-blur-md">
+            <Zap size={10} className="fill-[var(--primary)] text-[var(--primary)]" /> TOP
           </div>
         )}
 
@@ -53,8 +53,8 @@ export function ClubCard({ club }: { club: Club }) {
 
         <div className="mt-auto pt-4">
           <div className="flex items-center gap-1.5">
-            <Star size={14} className="fill-amber-400 text-amber-400" />
-            <span className="font-semibold text-amber-400">
+            <Star size={14} className="fill-[var(--accent)] text-[var(--accent)]" />
+            <span className="font-semibold text-[var(--accent)]">
               {club.ratingAverage?.toFixed(1) ?? '0.0'}
             </span>
             <span className="text-xs text-[var(--muted)]">({club.ratingCount} izoh)</span>
