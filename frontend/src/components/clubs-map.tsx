@@ -7,7 +7,7 @@ import Link from 'next/link';
 import { RatingBadge } from '@/components/star-rating';
 import type { Club } from '@/types';
 
-// Next.js bundlingda leaflet'ning default marker rasm yo'llari singan bo'ladi — qo'lda tuzatamiz.
+// Leaflet default icons setup for Next.js
 const markerIcon = L.icon({
   iconUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png',
   iconRetinaUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png',
@@ -30,36 +30,63 @@ function FitBounds({ clubs }: { clubs: Club[] }) {
   return null;
 }
 
-export function ClubsMap({ clubs, height = 420 }: { clubs: Club[]; height?: number }) {
-  // MapContainer faqat birinchi renderdagi center/zoom qiymatidan foydalanadi — keyingi
-  // o'zgarishlarni FitBounds orqali boshqaramiz, shuning uchun bu yerda ref shart emas.
+export function ClubsMap({ clubs, height = 400 }: { clubs: Club[]; height?: number }) {
   const initialCenter: [number, number] = clubs[0] ? [clubs[0].location.lat, clubs[0].location.lng] : TASHKENT;
 
   return (
-    <div style={{ height }} className="overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_8px_24px_rgba(0,0,0,0.3)]">
-      <MapContainer center={initialCenter} zoom={12} scrollWheelZoom>
-        <TileLayer
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> &copy; <a href="https://carto.com/attributions">CARTO</a>'
-          url="https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png"
-        />
-        <FitBounds clubs={clubs} />
-        {clubs.map((club) => (
-          <Marker key={club._id} position={[club.location.lat, club.location.lng]} icon={markerIcon}>
-            <Popup>
-              <div className="min-w-[160px]">
-                <p className="font-semibold">{club.name}</p>
-                <p className="text-xs text-[var(--muted)]">{club.address}</p>
-                <p className="mt-1 text-xs">
-                  <RatingBadge value={club.ratingAverage} count={club.ratingCount} size={12} />
-                </p>
-                <Link href={`/clubs/${club._id}`} className="mt-2 inline-block text-xs font-semibold text-[var(--primary)]">
-                  Ko&apos;rish →
-                </Link>
-              </div>
-            </Popup>
-          </Marker>
-        ))}
-      </MapContainer>
-    </div>
+    <>
+      {/* Inline styles to perfectly invert the standard OpenStreetMap tiles into a Dark/Gaming aesthetic */}
+      <style>{`
+        .dark-map-tiles {
+          filter: invert(100%) hue-rotate(180deg) brightness(95%) contrast(90%);
+        }
+        .leaflet-popup-content-wrapper {
+          background-color: var(--surface2) !important;
+          color: var(--foreground) !important;
+          border: 1px solid var(--border);
+          border-radius: 12px !important;
+        }
+        .leaflet-popup-tip {
+          background-color: var(--surface2) !important;
+          border: 1px solid var(--border);
+        }
+        .leaflet-container a.leaflet-popup-close-button {
+          color: var(--muted) !important;
+        }
+      `}</style>
+      
+      <div 
+        style={{ height }} 
+        className="relative z-0 overflow-hidden rounded-2xl border border-[var(--border)] bg-[var(--surface)] shadow-[0_8px_32px_rgba(0,0,0,0.5)]"
+      >
+        <MapContainer center={initialCenter} zoom={12} scrollWheelZoom className="h-full w-full">
+          <TileLayer
+            className="dark-map-tiles"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+          />
+          <FitBounds clubs={clubs} />
+          {clubs.map((club) => (
+            <Marker key={club._id} position={[club.location.lat, club.location.lng]} icon={markerIcon}>
+              <Popup>
+                <div className="min-w-[160px] p-1">
+                  <p className="font-bold text-[var(--foreground)] text-sm mb-1">{club.name}</p>
+                  <p className="text-xs text-[var(--muted)] mb-2 leading-relaxed">{club.address}</p>
+                  <div className="mb-3">
+                    <RatingBadge value={club.ratingAverage} count={club.ratingCount} size={12} />
+                  </div>
+                  <Link 
+                    href={`/clubs/${club._id}`} 
+                    className="block w-full rounded-lg bg-[var(--primary)]/10 px-3 py-1.5 text-center text-xs font-semibold text-[var(--primary)] transition-colors hover:bg-[var(--primary)]/20"
+                  >
+                    Batafsil ko'rish
+                  </Link>
+                </div>
+              </Popup>
+            </Marker>
+          ))}
+        </MapContainer>
+      </div>
+    </>
   );
 }

@@ -30,7 +30,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Mobil: gaming topbar */}
         <div className="sticky top-0 z-30 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)]/80 px-4 py-3 backdrop-blur-xl md:hidden">
-          <Link href="/" className="flex items-center gap-2.5 text-base font-extrabold tracking-tight text-[var(--foreground)]">
+          <Link href="/clubs" className="flex items-center gap-2.5 text-base font-extrabold tracking-tight text-[var(--foreground)]">
             {/* Neon logo icon */}
             <span className="relative grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-sm font-black text-white shadow-[0_0_14px_var(--primary-glow)]">
               P
@@ -59,7 +59,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               </button>
             ) : (
               <Link
-                href="/login"
+                href={`/login?from=${encodeURIComponent(pathname)}`}
                 className="rounded-xl border border-[var(--primary)]/40 bg-[var(--primary)]/10 px-3 py-1.5 text-sm font-semibold text-[var(--primary)] transition-all hover:bg-[var(--primary)]/20"
               >
                 Kirish

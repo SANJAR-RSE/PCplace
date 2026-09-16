@@ -23,8 +23,19 @@ const AuthContext = createContext<AuthContextValue | null>(null);
 
 const TOKEN_KEY = 'pcplace_token';
 
+// Cookie'ga token saqlash (middleware server tomonida o'qishi uchun)
+function saveTokenCookie(token: string) {
+  // 7 kunlik cookie, SameSite=Strict, Secure (HTTPS da)
+  const maxAge = 60 * 60 * 24 * 7;
+  document.cookie = `${TOKEN_KEY}=${token}; path=/; max-age=${maxAge}; SameSite=Strict`;
+}
+
+function clearTokenCookie() {
+  document.cookie = `${TOKEN_KEY}=; path=/; max-age=0; SameSite=Strict`;
+}
+
 function meEndpointFor(role: Role, sub: string): string {
-  if (role === 'admin') return `/admins/${sub}`; // adminlar uchun alohida "me" yo'q — o'z id'si bilan olinadi
+  if (role === 'admin') return `/admins/${sub}`;
   if (role === 'clubOwner') return '/club-owners/me';
   return '/users/me';
 }
@@ -33,7 +44,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [state, setState] = useState<AuthState>({ token: null, role: null, user: null, loading: true });
 
   const applyAuth = useCallback((res: AuthResponse) => {
+    // localStorage — tez o'qish uchun
     localStorage.setItem(TOKEN_KEY, res.accessToken);
+    // cookie — middleware (server-side) o'qishi uchun
+    saveTokenCookie(res.accessToken);
+
     const payload = decodeJwt(res.accessToken);
     setState({ token: res.accessToken, role: payload?.role ?? null, user: res.user, loading: false });
   }, []);
@@ -41,21 +56,26 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const refreshMe = useCallback(async () => {
     const token = localStorage.getItem(TOKEN_KEY);
     if (!token) {
+      clearTokenCookie();
       setState({ token: null, role: null, user: null, loading: false });
       return;
     }
     const payload = decodeJwt(token);
     if (!payload || (payload.exp && payload.exp * 1000 < Date.now())) {
       localStorage.removeItem(TOKEN_KEY);
+      clearTokenCookie();
       setState({ token: null, role: null, user: null, loading: false });
       return;
     }
+    // Cookie'ni ham yangilab qo'yamiz (browser yangilanganda yo'qolib ketmasligi uchun)
+    saveTokenCookie(token);
     try {
       const user = await api.get<CurrentUser>(meEndpointFor(payload.role, payload.sub));
       setState({ token, role: payload.role, user, loading: false });
     } catch (err) {
       if (err instanceof ApiError && err.status === 401) {
         localStorage.removeItem(TOKEN_KEY);
+        clearTokenCookie();
         setState({ token: null, role: null, user: null, loading: false });
       } else {
         setState({ token, role: payload.role, user: { _id: payload.sub, fullName: '', email: payload.email }, loading: false });
@@ -64,9 +84,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    // Mount paytida localStorage'dagi tokenni tekshirish sinxron bo'lishi shart
-    // (token yo'q/eskirgan holatlarda kechiktirish uchun asinxron amal yo'q).
-    // eslint-disable-next-line react-hooks/set-state-in-effect
     refreshMe();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -89,6 +106,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const logout = useCallback(() => {
     localStorage.removeItem(TOKEN_KEY);
+    clearTokenCookie();
     setState({ token: null, role: null, user: null, loading: false });
   }, []);
 

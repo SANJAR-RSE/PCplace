@@ -1,16 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { FormEvent, useState } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { FormEvent, Suspense, useState } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { ApiError } from '@/lib/api';
-import { Button, ErrorText, Field, Input } from '@/components/ui';
+import { Button, ErrorText, Field, Input, Spinner } from '@/components/ui';
 import { Gamepad2, ArrowRight } from 'lucide-react';
 
-export default function LoginPage() {
+function LoginForm() {
   const { login } = useAuth();
   const router = useRouter();
+  const searchParams = useSearchParams();
+
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -22,7 +24,10 @@ export default function LoginPage() {
     setLoading(true);
     try {
       await login(email, password);
-      router.push('/');
+      // Login bo'lgandan keyin avvalgi sahifaga qaytish
+      const from = searchParams.get('from') ?? '/clubs';
+      router.push(from);
+
     } catch (err) {
       setError(err instanceof ApiError ? err.message : 'Kirishda xatolik yuz berdi');
     } finally {
@@ -104,5 +109,13 @@ export default function LoginPage() {
         </p>
       </div>
     </div>
+  );
+}
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={<div className="flex min-h-screen items-center justify-center"><Spinner /></div>}>
+      <LoginForm />
+    </Suspense>
   );
 }
