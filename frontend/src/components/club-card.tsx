@@ -1,5 +1,5 @@
 import Link from 'next/link';
-import { Gamepad2, MapPin, Star } from 'lucide-react';
+import { Gamepad2, MapPin, Star, Zap } from 'lucide-react';
 import type { Club } from '@/types';
 
 export function ClubCard({ club }: { club: Club }) {
@@ -31,8 +31,8 @@ export function ClubCard({ club }: { club: Club }) {
 
         {/* TOP badge */}
         {club.isPromoted && (
-          <div className="absolute right-3 top-3 z-10 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)] backdrop-blur-md">
-            ⚡ TOP
+          <div className="absolute right-3 top-3 z-10 flex items-center gap-1 rounded-full border border-amber-500/30 bg-amber-500/10 px-2.5 py-1 text-[10px] font-black uppercase tracking-widest text-amber-400 shadow-[0_0_12px_rgba(251,191,36,0.3)] backdrop-blur-md">
+            <Zap size={10} className="fill-amber-400 text-amber-400" /> TOP
           </div>
         )}
 
