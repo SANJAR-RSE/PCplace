@@ -34,7 +34,10 @@ export function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     <div className="flex h-full flex-col">
       {/* Logo */}
       <Link href="/" className="flex items-center gap-3 px-5 py-6">
-        <img src="/logo.png" alt="PCplace" className="h-10 w-10 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
+        <span className="relative grid h-10 w-10 place-items-center rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-base font-black text-white shadow-[0_0_18px_var(--primary-glow)]">
+          P
+          <span className="absolute -inset-[1px] rounded-xl border border-[var(--primary)]/50" />
+        </span>
         <div>
           <p className="text-base font-extrabold tracking-tight text-[var(--foreground)]">PCplace</p>
           <p className="text-[10px] font-bold uppercase tracking-widest text-[var(--primary)]/70">Gaming Hub</p>

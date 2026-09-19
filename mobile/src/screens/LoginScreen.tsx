@@ -1,7 +1,8 @@
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator, Image } from 'react-native';
+import { View, Text, TextInput, TouchableOpacity, StyleSheet, ActivityIndicator } from 'react-native';
 import { useAuth } from '../context/AuthContext';
 import { theme } from '../theme';
+import { Gamepad2 } from 'lucide-react-native';
 
 export function LoginScreen() {
   const { login } = useAuth();
@@ -25,11 +26,9 @@ export function LoginScreen() {
   return (
     <View style={styles.container}>
       <View style={styles.header}>
-        <Image 
-          source={require('../../assets/logo.png')} 
-          style={styles.logoImage} 
-          resizeMode="contain" 
-        />
+        <View style={styles.logoContainer}>
+          <Gamepad2 size={48} color={theme.colors.primary} />
+        </View>
         <Text style={styles.title}>Tizimga kirish</Text>
 
         <Text style={styles.subtitle}>PCplace mobil ilovasiga xush kelibsiz</Text>
@@ -84,11 +83,16 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     marginBottom: 40,
   },
-  logoImage: {
-    width: 140,
-    height: 140,
-    marginBottom: 20,
+  logoContainer: {
+    width: 80,
+    height: 80,
     borderRadius: 20,
+    backgroundColor: 'rgba(168,85,247,0.1)',
+    borderWidth: 1,
+    borderColor: 'rgba(168,85,247,0.3)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 20,
   },
   title: {
     fontSize: 28,

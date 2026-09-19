@@ -31,7 +31,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         {/* Mobil: gaming topbar */}
         <div className="sticky top-0 z-30 flex items-center justify-between border-b border-[var(--border)] bg-[var(--surface)]/80 px-4 py-3 backdrop-blur-xl md:hidden">
           <Link href="/clubs" className="flex items-center gap-2.5 text-base font-extrabold tracking-tight text-[var(--foreground)]">
-            <img src="/logo.png" alt="PCplace" className="h-8 w-8 object-contain drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
+            {/* Neon logo icon */}
+            <span className="relative grid h-8 w-8 place-items-center rounded-xl bg-gradient-to-br from-[var(--primary)] to-[var(--primary-dark)] text-sm font-black text-white shadow-[0_0_14px_var(--primary-glow)]">
+              P
+              <span className="absolute -inset-[1px] rounded-xl border border-[var(--primary)]/40" />
+            </span>
             <span className="bg-gradient-to-r from-[var(--foreground)] to-[var(--foreground)]/70 bg-clip-text text-transparent">
               PCplace
             </span>
