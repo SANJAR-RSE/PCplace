@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { api } from '../api';
+import { jwtDecode } from 'jwt-decode';
 
 type User = {
   _id: string;
@@ -8,6 +9,12 @@ type User = {
   fullName?: string;
   role: string;
   plan?: string;
+};
+
+type JwtPayload = {
+  sub: string;
+  role: string;
+  email: string;
 };
 
 type AuthContextType = {
@@ -18,6 +25,12 @@ type AuthContextType = {
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
+
+function meEndpointFor(role: string, sub: string): string {
+  if (role === 'admin') return `/admins/${sub}`;
+  if (role === 'clubOwner') return '/club-owners/me';
+  return `/users/${sub}`;
+}
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
@@ -31,8 +44,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       const token = await AsyncStorage.getItem('pcplace_token');
       if (token) {
-        const res = await api.get('/auth/me');
-        setUser(res.data);
+        const payload = jwtDecode<JwtPayload>(token);
+        // "proxy fetching" orqali to'g'ri endpointdan user ma'lumotlarini olish
+        const res = await api.get(meEndpointFor(payload.role, payload.sub));
+        // api.get endi to'g'ridan to'g'ri datani qaytaradi (fetch wrapper)
+        setUser(res);
       }
     } catch (err) {
       await AsyncStorage.removeItem('pcplace_token');
@@ -42,10 +58,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function login(email: string, password: string) {
-    const res = await api.post('/auth/login', { email, password });
-    const { token, user } = res.data;
+    const res = await api.post<{ accessToken: string }>('/auth/login', { email, password });
+    const token = res.accessToken;
+    const payload = jwtDecode<JwtPayload>(token);
+    
     await AsyncStorage.setItem('pcplace_token', token);
-    setUser(user);
+    const userData = await api.get(meEndpointFor(payload.role, payload.sub));
+    setUser(userData);
   }
 
   async function logout() {
