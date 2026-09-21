@@ -15,6 +15,7 @@ type JwtPayload = {
   sub: string;
   role: string;
   email: string;
+  exp?: number;
 };
 
 type AuthContextType = {
@@ -45,10 +46,16 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const token = await AsyncStorage.getItem('pcplace_token');
       if (token) {
         const payload = jwtDecode<JwtPayload>(token);
-        // "proxy fetching" orqali to'g'ri endpointdan user ma'lumotlarini olish
-        const res = await api.get(meEndpointFor(payload.role, payload.sub));
-        // api.get endi to'g'ridan to'g'ri datani qaytaradi (fetch wrapper)
-        setUser(res);
+        // Token amal qilish muddatini tekshirish
+        if (payload.exp && payload.exp * 1000 < Date.now()) {
+          await AsyncStorage.removeItem('pcplace_token');
+          setLoading(false);
+          return;
+        }
+        // Rolga qarab to'g'ri endpointdan user ma'lumotini olish
+        const endpoint = meEndpointFor(payload.role, payload.sub);
+        const userData = await api.get<User>(endpoint);
+        setUser({ ...userData, role: payload.role });
       }
     } catch (err) {
       await AsyncStorage.removeItem('pcplace_token');
@@ -58,13 +65,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function login(email: string, password: string) {
-    const res = await api.post<{ accessToken: string }>('/auth/login', { email, password });
-    const token = res.accessToken;
-    const payload = jwtDecode<JwtPayload>(token);
+    // Backend { accessToken, user } qaytaradi
+    const res = await api.post<{ accessToken: string; user: User }>('/auth/login', { email, password });
+    const { accessToken, user } = res;
+    const payload = jwtDecode<JwtPayload>(accessToken);
     
-    await AsyncStorage.setItem('pcplace_token', token);
-    const userData = await api.get(meEndpointFor(payload.role, payload.sub));
-    setUser(userData);
+    await AsyncStorage.setItem('pcplace_token', accessToken);
+    // Backend login javobidagi user ni to'g'ridan-to'g'ri ishlat + rolni qo'sh
+    setUser({ ...user, role: payload.role });
   }
 
   async function logout() {
