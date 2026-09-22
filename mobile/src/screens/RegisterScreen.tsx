@@ -6,26 +6,32 @@ import {
 import { useAuth } from '../context/AuthContext';
 import { theme } from '../theme';
 
-type Props = { onGoRegister: () => void };
+type Props = { onGoLogin: () => void };
 
-export function LoginScreen({ onGoRegister }: Props) {
-  const { login } = useAuth();
+export function RegisterScreen({ onGoLogin }: Props) {
+  const { register } = useAuth();
+  const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [phone, setPhone] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 
-  async function handleLogin() {
-    if (!email.trim() || !password.trim()) {
-      setError("Email va parolni kiriting");
+  async function handleRegister() {
+    if (!fullName.trim() || !email.trim() || !password.trim()) {
+      setError("Ism, email va parol majburiy");
+      return;
+    }
+    if (password.length < 6) {
+      setError("Parol kamida 6 ta belgidan iborat bo'lishi kerak");
       return;
     }
     try {
       setError('');
       setLoading(true);
-      await login(email.trim(), password);
+      await register(fullName.trim(), email.trim(), password, phone.trim() || undefined);
     } catch (err: any) {
-      setError(err.message || 'Login xatosi yuz berdi');
+      setError(err.message || "Ro'yxatdan o'tishda xatolik");
     } finally {
       setLoading(false);
     }
@@ -39,8 +45,8 @@ export function LoginScreen({ onGoRegister }: Props) {
             <Text style={styles.logoP}>P</Text>
             <View style={styles.logoAccent} />
           </View>
-          <Text style={styles.title}>Tizimga kirish</Text>
-          <Text style={styles.subtitle}>PCplace mobil ilovasiga xush kelibsiz</Text>
+          <Text style={styles.title}>Ro'yxatdan o'tish</Text>
+          <Text style={styles.subtitle}>PCplace ga qo'shiling</Text>
         </View>
 
         <View style={styles.form}>
@@ -51,7 +57,19 @@ export function LoginScreen({ onGoRegister }: Props) {
           ) : null}
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Email</Text>
+            <Text style={styles.label}>To'liq ism *</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="Ism Familiya"
+              placeholderTextColor={theme.colors.textMuted}
+              value={fullName}
+              onChangeText={setFullName}
+              autoCapitalize="words"
+            />
+          </View>
+
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Email *</Text>
             <TextInput
               style={styles.input}
               placeholder="email@example.com"
@@ -65,10 +83,10 @@ export function LoginScreen({ onGoRegister }: Props) {
           </View>
 
           <View style={styles.inputGroup}>
-            <Text style={styles.label}>Parol</Text>
+            <Text style={styles.label}>Parol *</Text>
             <TextInput
               style={styles.input}
-              placeholder="••••••••"
+              placeholder="Kamida 6 ta belgi"
               placeholderTextColor={theme.colors.textMuted}
               value={password}
               onChangeText={setPassword}
@@ -76,17 +94,31 @@ export function LoginScreen({ onGoRegister }: Props) {
             />
           </View>
 
+          <View style={styles.inputGroup}>
+            <Text style={styles.label}>Telefon (ixtiyoriy)</Text>
+            <TextInput
+              style={styles.input}
+              placeholder="+998 90 000 00 00"
+              placeholderTextColor={theme.colors.textMuted}
+              value={phone}
+              onChangeText={setPhone}
+              keyboardType="phone-pad"
+            />
+          </View>
+
           <TouchableOpacity
             style={[styles.button, loading && styles.buttonDisabled]}
-            onPress={handleLogin}
+            onPress={handleRegister}
             disabled={loading}
           >
-            {loading ? <ActivityIndicator color="#fff" /> : <Text style={styles.buttonText}>Kirish</Text>}
+            {loading
+              ? <ActivityIndicator color="#fff" />
+              : <Text style={styles.buttonText}>Ro'yxatdan o'tish</Text>}
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.registerLink} onPress={onGoRegister}>
-            <Text style={styles.registerText}>
-              Hisobingiz yo'qmi? <Text style={styles.registerHighlight}>Ro'yxatdan o'ting</Text>
+          <TouchableOpacity style={styles.loginLink} onPress={onGoLogin}>
+            <Text style={styles.loginText}>
+              Hisobingiz bormi? <Text style={styles.loginHighlight}>Kirish</Text>
             </Text>
           </TouchableOpacity>
         </View>
@@ -97,12 +129,10 @@ export function LoginScreen({ onGoRegister }: Props) {
 
 const styles = StyleSheet.create({
   container: {
-    flexGrow: 1,
-    backgroundColor: theme.colors.background,
-    padding: theme.spacing.lg,
-    justifyContent: 'center',
+    flexGrow: 1, backgroundColor: theme.colors.background,
+    padding: theme.spacing.lg, justifyContent: 'center',
   },
-  header: { alignItems: 'center', marginBottom: 40 },
+  header: { alignItems: 'center', marginBottom: 32 },
   logoContainer: {
     width: 80, height: 80, borderRadius: 20,
     backgroundColor: 'rgba(168,85,247,0.1)',
@@ -122,7 +152,7 @@ const styles = StyleSheet.create({
     borderColor: theme.colors.accent,
     borderTopLeftRadius: 6,
   },
-  title: { fontSize: 28, fontWeight: '900', color: theme.colors.text, marginBottom: 6 },
+  title: { fontSize: 26, fontWeight: '900', color: theme.colors.text, marginBottom: 6 },
   subtitle: { fontSize: 14, color: theme.colors.textMuted },
   form: { gap: 14 },
   errorBox: {
@@ -144,7 +174,7 @@ const styles = StyleSheet.create({
   },
   buttonDisabled: { opacity: 0.6 },
   buttonText: { color: '#fff', fontSize: 16, fontWeight: 'bold' },
-  registerLink: { alignItems: 'center', paddingVertical: 8 },
-  registerText: { color: theme.colors.textMuted, fontSize: 14 },
-  registerHighlight: { color: theme.colors.primary, fontWeight: '700' },
+  loginLink: { alignItems: 'center', paddingVertical: 8 },
+  loginText: { color: theme.colors.textMuted, fontSize: 14 },
+  loginHighlight: { color: theme.colors.primary, fontWeight: '700' },
 });

@@ -1,35 +1,40 @@
 import React, { useState } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { useAuth } from '../context/AuthContext';
-import { LoginScreen } from '../screens/LoginScreen';
 import { TabNavigator } from './TabNavigator';
+import { LoginScreen } from '../screens/LoginScreen';
+import { RegisterScreen } from '../screens/RegisterScreen';
 import { AnimatedSplash } from '../screens/AnimatedSplash';
+import { View, ActivityIndicator } from 'react-native';
+import { theme } from '../theme';
 
-const Stack = createNativeStackNavigator();
+type AuthScreen = 'login' | 'register';
 
 export function AppNavigator() {
   const { user, loading } = useAuth();
   const [splashFinished, setSplashFinished] = useState(false);
+  const [authScreen, setAuthScreen] = useState<AuthScreen>('login');
 
   return (
     <>
+      {/* Main App */}
       {!loading && (
         <NavigationContainer>
-          <Stack.Navigator screenOptions={{ headerShown: false }}>
-            {user ? (
-              <Stack.Screen name="Main" component={TabNavigator} />
-            ) : (
-              <Stack.Screen name="Login" component={LoginScreen} />
-            )}
-          </Stack.Navigator>
+          {user ? (
+            <TabNavigator />
+          ) : authScreen === 'login' ? (
+            <LoginScreen onGoRegister={() => setAuthScreen('register')} />
+          ) : (
+            <RegisterScreen onGoLogin={() => setAuthScreen('login')} />
+          )}
         </NavigationContainer>
       )}
 
+      {/* Animated Splash — login/register holati aniqlanguncha ustida turadi */}
       {!splashFinished && (
-        <AnimatedSplash 
-          isAuthLoaded={!loading} 
-          onAnimationComplete={() => setSplashFinished(true)} 
+        <AnimatedSplash
+          isAuthLoaded={!loading}
+          onAnimationComplete={() => setSplashFinished(true)}
         />
       )}
     </>

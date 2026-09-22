@@ -1,19 +1,22 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { api } from '../api';
+import { api, ApiError } from '../api';
 import { jwtDecode } from 'jwt-decode';
 
-type User = {
+export type UserRole = 'user' | 'admin' | 'clubOwner';
+
+export type User = {
   _id: string;
   email: string;
   fullName?: string;
-  role: string;
+  role: UserRole;
   plan?: string;
+  phone?: string;
 };
 
 type JwtPayload = {
   sub: string;
-  role: string;
+  role: UserRole;
   email: string;
   exp?: number;
 };
@@ -22,15 +25,17 @@ type AuthContextType = {
   user: User | null;
   loading: boolean;
   login: (email: string, password: string) => Promise<void>;
+  register: (fullName: string, email: string, password: string, phone?: string) => Promise<void>;
   logout: () => Promise<void>;
+  refreshUser: () => Promise<void>;
 };
 
 const AuthContext = createContext<AuthContextType>({} as AuthContextType);
 
-function meEndpointFor(role: string, sub: string): string {
+function meEndpointFor(role: UserRole, sub: string): string {
   if (role === 'admin') return `/admins/${sub}`;
   if (role === 'clubOwner') return '/club-owners/me';
-  return `/users/${sub}`;
+  return '/users/me';
 }
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
@@ -44,20 +49,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   async function loadUser() {
     try {
       const token = await AsyncStorage.getItem('pcplace_token');
-      if (token) {
-        const payload = jwtDecode<JwtPayload>(token);
-        // Token amal qilish muddatini tekshirish
-        if (payload.exp && payload.exp * 1000 < Date.now()) {
-          await AsyncStorage.removeItem('pcplace_token');
-          setLoading(false);
-          return;
-        }
-        // Rolga qarab to'g'ri endpointdan user ma'lumotini olish
-        const endpoint = meEndpointFor(payload.role, payload.sub);
-        const userData = await api.get<User>(endpoint);
-        setUser({ ...userData, role: payload.role });
+      if (!token) {
+        setLoading(false);
+        return;
       }
-    } catch (err) {
+
+      const payload = jwtDecode<JwtPayload>(token);
+
+      // Token muddati tugagan bo'lsa tozala
+      if (payload.exp && payload.exp * 1000 < Date.now()) {
+        await AsyncStorage.removeItem('pcplace_token');
+        setLoading(false);
+        return;
+      }
+
+      const endpoint = meEndpointFor(payload.role, payload.sub);
+      const userData = await api.get<any>(endpoint);
+      setUser({ ...userData, role: payload.role });
+    } catch {
+      // Token yaroqsiz — tozala, lekin ilovadan chiqarma
       await AsyncStorage.removeItem('pcplace_token');
     } finally {
       setLoading(false);
@@ -65,14 +75,35 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function login(email: string, password: string) {
-    // Backend { accessToken, user } qaytaradi
-    const res = await api.post<{ accessToken: string; user: User }>('/auth/login', { email, password });
-    const { accessToken, user } = res;
+    const res = await api.post<{ accessToken: string; user: any }>('/auth/login', { email, password });
+    const { accessToken, user: userData } = res;
     const payload = jwtDecode<JwtPayload>(accessToken);
-    
+
     await AsyncStorage.setItem('pcplace_token', accessToken);
-    // Backend login javobidagi user ni to'g'ridan-to'g'ri ishlat + rolni qo'sh
-    setUser({ ...user, role: payload.role });
+    setUser({ ...userData, role: payload.role });
+  }
+
+  async function register(fullName: string, email: string, password: string, phone?: string) {
+    const res = await api.post<{ accessToken: string; user: any }>('/auth/register', {
+      fullName,
+      email,
+      password,
+      phone,
+    });
+    const { accessToken, user: userData } = res;
+    const payload = jwtDecode<JwtPayload>(accessToken);
+
+    await AsyncStorage.setItem('pcplace_token', accessToken);
+    setUser({ ...userData, role: payload.role });
+  }
+
+  async function refreshUser() {
+    const token = await AsyncStorage.getItem('pcplace_token');
+    if (!token) return;
+    const payload = jwtDecode<JwtPayload>(token);
+    const endpoint = meEndpointFor(payload.role, payload.sub);
+    const userData = await api.get<any>(endpoint);
+    setUser({ ...userData, role: payload.role });
   }
 
   async function logout() {
@@ -81,7 +112,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, login, logout }}>
+    <AuthContext.Provider value={{ user, loading, login, register, logout, refreshUser }}>
       {children}
     </AuthContext.Provider>
   );
