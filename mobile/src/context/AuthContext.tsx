@@ -66,9 +66,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const endpoint = meEndpointFor(payload.role, payload.sub);
       const userData = await api.get<any>(endpoint);
       setUser({ ...userData, role: payload.role });
-    } catch {
-      // Token yaroqsiz — tozala, lekin ilovadan chiqarma
-      await AsyncStorage.removeItem('pcplace_token');
+    } catch (error) {
+      // Keep valid sessions through temporary network or server failures.
+      const status = error instanceof ApiError ? error.status : undefined;
+      const malformedToken = error instanceof Error && error.name === 'InvalidTokenError';
+      if (status === 401 || status === 403 || malformedToken) {
+        await AsyncStorage.removeItem('pcplace_token').catch(() => undefined);
+        setUser(null);
+      }
     } finally {
       setLoading(false);
     }
