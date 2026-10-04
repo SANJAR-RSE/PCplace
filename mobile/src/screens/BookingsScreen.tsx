@@ -66,7 +66,7 @@ export function BookingsScreen() {
         text: 'Ha, bekor qilish', style: 'destructive', onPress: async () => {
           try {
             await api.patch(`/bookings/${id}/cancel`);
-            fetchBookings();
+            await fetchBookings();
           } catch (err: any) {
             Alert.alert('Xatolik', err.message);
           }

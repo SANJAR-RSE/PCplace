@@ -5,7 +5,6 @@ import { TabNavigator } from './TabNavigator';
 import { LoginScreen } from '../screens/LoginScreen';
 import { RegisterScreen } from '../screens/RegisterScreen';
 import { AnimatedSplash } from '../screens/AnimatedSplash';
-import { View, ActivityIndicator } from 'react-native';
 import { theme } from '../theme';
 
 type AuthScreen = 'login' | 'register';
@@ -17,18 +16,20 @@ export function AppNavigator() {
 
   return (
     <>
-      {/* Main App */}
-      {!loading && (
-        <NavigationContainer>
-          {user ? (
-            <TabNavigator />
-          ) : authScreen === 'login' ? (
-            <LoginScreen onGoRegister={() => setAuthScreen('register')} />
-          ) : (
-            <RegisterScreen onGoLogin={() => setAuthScreen('login')} />
-          )}
-        </NavigationContainer>
-      )}
+      {/* Main App — NavigationContainer har doim mount qilinadi, ichida holat boshqariladi */}
+      <NavigationContainer>
+        {!loading && (
+          <>
+            {user ? (
+              <TabNavigator />
+            ) : authScreen === 'login' ? (
+              <LoginScreen onGoRegister={() => setAuthScreen('register')} />
+            ) : (
+              <RegisterScreen onGoLogin={() => setAuthScreen('login')} />
+            )}
+          </>
+        )}
+      </NavigationContainer>
 
       {/* Animated Splash — login/register holati aniqlanguncha ustida turadi */}
       {!splashFinished && (

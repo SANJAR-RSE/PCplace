@@ -101,7 +101,7 @@ export function AnimatedSplash({ isAuthLoaded, onAnimationComplete }: Props) {
         onAnimationComplete();
       });
     }
-  }, [sequenceDone, isAuthLoaded]);
+  }, [sequenceDone, isAuthLoaded, onAnimationComplete]);
 
   return (
     <Animated.View style={[styles.container, { opacity: screenOpacity }]}>

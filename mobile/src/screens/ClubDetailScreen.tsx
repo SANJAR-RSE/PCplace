@@ -42,7 +42,11 @@ export function ClubDetailScreen({ club, onBack }: Props) {
         setSelectedRoom(data[0]);
         fetchPcs(data[0]._id);
       }
-    } catch { } finally { setLoading(false); }
+    } catch (err: any) {
+      Alert.alert('Xatolik', err.message || "Xonalarni yuklab bo'lmadi");
+    } finally {
+      setLoading(false);
+    }
   }, [club._id]);
 
   const fetchPcs = useCallback(async (roomId: string) => {
@@ -51,7 +55,10 @@ export function ClubDetailScreen({ club, onBack }: Props) {
       setPcs(data);
       const free = data.find(p => p.status === 'bosh');
       setSelectedPc(free || null);
-    } catch { setPcs([]); }
+    } catch {
+      setPcs([]);
+      setSelectedPc(null);
+    }
   }, []);
 
   useEffect(() => { fetchRooms(); }, [fetchRooms]);
