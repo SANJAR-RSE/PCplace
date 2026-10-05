@@ -11,9 +11,8 @@ type Club = {
   _id: string;
   name: string;
   address: string;
-  description?: string;
-  pricePerHour: number;
-  rating?: number;
+  ratingAverage?: number;
+  ratingCount?: number;
   isPromoted?: boolean;
   status?: string;
 };
@@ -61,10 +60,10 @@ export function ClubsScreen({ onSelectClub }: Props) {
         )}
         <View style={styles.cardHeader}>
           <Text style={styles.cardName} numberOfLines={1}>{item.name}</Text>
-          {item.rating ? (
+          {item.ratingAverage ? (
             <View style={styles.ratingRow}>
               <Star size={12} color="#fbbf24" fill="#fbbf24" />
-              <Text style={styles.ratingText}>{item.rating.toFixed(1)}</Text>
+              <Text style={styles.ratingText}>{item.ratingAverage.toFixed(1)}</Text>
             </View>
           ) : null}
         </View>
@@ -72,13 +71,8 @@ export function ClubsScreen({ onSelectClub }: Props) {
           <MapPin size={13} color={theme.colors.textMuted} />
           <Text style={styles.address} numberOfLines={1}>{item.address}</Text>
         </View>
-        {item.description ? (
-          <Text style={styles.description} numberOfLines={2}>{item.description}</Text>
-        ) : null}
         <View style={styles.cardFooter}>
-          <Text style={styles.price}>
-            {item.pricePerHour.toLocaleString()} so'm<Text style={styles.perHour}>/soat</Text>
-          </Text>
+          <Text style={styles.price}>Narx xonaga bog'liq</Text>
           <View style={styles.bookBtn}>
             <Text style={styles.bookBtnText}>Bron qilish →</Text>
           </View>
